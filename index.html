@@ -180,12 +180,6 @@ td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--m
 .tcard{position:absolute;inset:0;display:flex;flex-direction:column;padding:0;overflow:hidden}
 .tscroll{flex:1 1 auto;min-height:0;overflow:auto;border-top:1px solid var(--line)}
 @media (max-width:980px){.tcell{min-height:0}.tcard{position:static}.tscroll{max-height:480px}}
-.authbox{margin-top:18px;border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
-.authf{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
-.authrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.authrow .eyebrow{width:100%}
-#authEmail{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0;width:260px;max-width:100%}
-.linkbtn{border:0;background:none;color:var(--accent-ink);cursor:pointer;font-size:12px;font-weight:600;padding:0 0 0 6px}
 .notice{border:1px dashed var(--line);border-radius:12px;padding:18px;background:var(--surface);color:var(--ink-2);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .notice p{margin:0;max-width:70ch}
 .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--warn-soft);color:var(--warn)}
@@ -221,19 +215,10 @@ td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--m
         </div>
         <span class="src" id="src" data-s="snap"><span class="dot"></span><span id="srcT">Snapshot</span></span>
         <button type="button" class="btn" id="live">Load live data</button>
-        <span class="src" id="user" hidden><span id="userEmail"></span><button type="button" class="linkbtn" id="signout">Sign out</button></span>
       </div>
     </div>
   </header>
 
-  <div class="brief authbox" id="auth" hidden>
-    <form id="authForm" class="authf">
-      <div><h2 style="margin:0 0 4px">Sign in for live data</h2><p id="authMsg" style="margin:0;color:var(--ink-2)"></p></div>
-      <div class="authrow"><label for="authEmail" class="eyebrow">Work email</label>
-        <input id="authEmail" type="email" autocomplete="email" placeholder="name@company.com" required>
-        <button type="submit" class="btn primary" id="authBtn">Email me a sign-in link</button></div>
-    </form>
-  </div>
   <div class="summary"><div class="brief" id="brief"></div></div>
 
   <section id="s-kpi">
@@ -575,7 +560,7 @@ function renderTable(){
 function campMsg(html){ document.getElementById("campBody").innerHTML=html; }
 function renderCampaigns(){
   const r=S.rows[S.sel], w=r.w;
-  if(!S.liveOn){
+  if(!S.mcp){
     campMsg(`<div class="notice"><p>Campaign drill-down (top campaigns, movers and traffic-vs-value) reads <code>otd_weekly_campaigns</code> straight from Supabase. Load live data to see it.</p><button type="button" class="btn primary" data-act="live">Load live data</button></div>`); return;
   }
   if(S.statsErr){ campMsg(`<div class="notice"><p>${esc(S.statsErr)}</p><button type="button" class="btn" data-act="live">Try again</button></div>`); return; }
@@ -661,8 +646,6 @@ function rowsFrom(res){
   throw {code:"parse",message:"Supabase answered, but not with rows this page recognises."};
 }
 function errText(e){
-  if(e && (e.code==="42501" || /not_allowed/.test(e.message||""))) return `${S.email?S.email+" isn't":"This account isn't"} on the dashboard's allowed list. Sign in with a company email, or ask an admin to add your email domain.`;
-  if(e && (e.code==="PGRST301" || /JWT/i.test(e.message||""))) return "Your sign-in has expired. Sign in again to load live data.";
   switch(e&&e.code){
     case "needs_reauth": return "Your Supabase connection has expired. Reconnect Supabase in claude.ai Settings → Connectors, then try again.";
     case "server_not_connected": return "The Supabase connector isn't added for your account. Add it in claude.ai Settings → Connectors to load live data.";
@@ -688,19 +671,11 @@ const qCamp=w=>`with c as (select week_start, campaign_id, coalesce(pageviews,0)
 function setSrc(s,t){ S.live=s; const e=document.getElementById("src"); e.dataset.s=s; document.getElementById("srcT").textContent=t; }
 async function goLive(){
   const btn=document.getElementById("live"); btn.disabled=true;
-  if(IN_CLAUDE){
-    if(!S.mcp){ const mcp=await window.claude.use("mcp").catch(()=>null);
-      if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
-      S.mcp=mcp; }
-  } else {
-    const sb=await getSB();
-    if(!sb){ setSrc("error","Snapshot · couldn't load the Supabase library"); btn.disabled=false; return; }
-    const { data:{ session } } = await sb.auth.getSession();
-    if(!session){ btn.disabled=false; showAuth(); return; }
-  }
-  S.liveOn=true;
+  if(!S.mcp){ const mcp=window.claude? await window.claude.use("mcp").catch(()=>null) : null;
+    if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
+    S.mcp=mcp; }
   setSrc("loading","Loading from Supabase… approve the prompt if one appears"); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; renderCampaigns();
-  const [sum,st]=await Promise.allSettled([fetchSummary(),fetchStats()]);
+  const [sum,st]=await Promise.allSettled([sql(Q_SUM),sql(Q_STATS)]);
   if(sum.status==="fulfilled" && sum.value.length){
     const keepW=S.rows[S.sel]&&S.rows[S.sel].w, wasLatest=S.sel===S.rows.length-1;
     setRows(sum.value.map(r=>{const o={w:r.w}; RAW.forEach(k=>o[k]=Number(r[k])||0); return o;}));
@@ -714,7 +689,7 @@ async function goLive(){
 }
 async function loadCamp(w){
   if(S.campLoading[w]) return; S.campLoading[w]=true;
-  try{ const rows=await fetchCampWeek(w); S.camp[w]=rows.map(r=>({id:String(r.id),pv:+r.pv,uv:+r.uv,ci:+r.ci,op:+r.op,d:+r.d,pd:+r.pd,tot:r.tot==null?null:+r.tot,fw:r.fw||null,nm:r.nm||""})); }
+  try{ const rows=await sql(qCamp(w)); S.camp[w]=rows.map(r=>({id:String(r.id),pv:+r.pv,uv:+r.uv,ci:+r.ci,op:+r.op,d:+r.d,pd:+r.pd,tot:r.tot==null?null:+r.tot,fw:r.fw||null,nm:r.nm||""})); }
   catch(e){ S.campErr[w]=errText(e); }
   S.campLoading[w]=false; if(S.rows[S.sel].w===w) renderCampaigns();
 }
@@ -752,7 +727,7 @@ function cohModel(selW){
 
 function renderCohorts(){
   const selW=S.rows[S.sel].w;
-  if(!S.liveOn){ cohMsg(`<div class="notice"><p>Launch-month cohorts group campaigns by the month they first appeared in <code>otd_weekly_campaigns</code>. They load from Supabase with the rest of the live data.</p><button type="button" class="btn primary" data-act="live">Load live data</button></div>`); return; }
+  if(!S.mcp){ cohMsg(`<div class="notice"><p>Launch-month cohorts group campaigns by the month they first appeared in <code>otd_weekly_campaigns</code>. They load from Supabase with the rest of the live data.</p><button type="button" class="btn primary" data-act="live">Load live data</button></div>`); return; }
   if(S.cohErr){ cohMsg(`<div class="notice"><p>${esc(S.cohErr)}</p><button type="button" class="btn" data-act="live">Try again</button></div>`); return; }
   if(!S.coh){ cohMsg(`<div class="notice"><p>Loading launch-month cohorts…</p></div>`); return; }
   if(!S.coh.seen.length){ cohMsg(`<div class="notice"><p>No campaign rows in Supabase yet.</p></div>`); return; }
@@ -829,70 +804,10 @@ function stackBars(host,cfg){
 }
 async function loadCohorts(){
   S.coh=null; S.cohErr=null;
-  try{ const {rows,camps,seen}=await fetchCohorts();
+  try{ const [rows,camps,seen]=await Promise.all([sql(Q_COH_ROWS),sql(Q_COH_CAMPS),sql(Q_COH_SEEN)]);
     S.coh={rows:rows.map(r=>({w:r.w,id:String(r.id),d:+r.d,op:+r.op})), camps:camps.map(c=>({id:String(c.id),fw:c.fw,nm:c.nm||""})), seen:seen.map(s=>({fw:s.fw,n:+s.n})).sort((a,b)=>a.fw<b.fw?-1:1)}; }
   catch(e){ S.cohErr=errText(e); }
   renderCohorts();
-}
-
-
-/* ---------- data layer: Claude connector (artifact) or Supabase (hosted page) ---------- */
-const IN_CLAUDE = !!window.claude;
-const SB_URL = "https://njgctrmitailbvjtyeiz.supabase.co";
-const SB_KEY = "sb_publishable_rAYKIz4k6hXqg5H-QPiDSg_cUfMPZYH"; // publishable key: safe in a web page; data access is enforced in the database
-const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js";
-let _sb=null, _sbLoading=null;
-function getSB(){
-  if(_sb) return Promise.resolve(_sb);
-  if(_sbLoading) return _sbLoading;
-  _sbLoading=new Promise(res=>{
-    const done=()=>{ try{ _sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}); res(_sb);}catch(e){ res(null);} };
-    if(window.supabase&&window.supabase.createClient) return done();
-    const s=document.createElement("script"); s.src=SB_LIB; s.onload=done; s.onerror=()=>res(null); document.head.appendChild(s);
-  });
-  return _sbLoading;
-}
-async function rpc(name,args){
-  const sb=await getSB(); const {data,error}=await sb.rpc(name,args||{});
-  if(error) throw {code:error.code,message:error.message}; return data;
-}
-const fetchSummary = () => IN_CLAUDE ? sql(Q_SUM) : rpc("otd_dash_weekly_summary");
-const fetchStats   = () => IN_CLAUDE ? sql(Q_STATS) : rpc("otd_dash_campaign_stats");
-const fetchCampWeek= w  => IN_CLAUDE ? sql(qCamp(w)) : rpc("otd_dash_campaign_week",{w});
-async function fetchCohorts(){
-  if(IN_CLAUDE){ const [rows,camps,seen]=await Promise.all([sql(Q_COH_ROWS),sql(Q_COH_CAMPS),sql(Q_COH_SEEN)]); return {rows,camps,seen}; }
-  const d=await rpc("otd_dash_cohorts"); return {rows:d.rows||[],camps:d.camps||[],seen:d.seen||[]};
-}
-
-/* ---------- sign-in (hosted page only) ---------- */
-function showAuth(msg){
-  const a=document.getElementById("auth"); a.hidden=false;
-  document.getElementById("authMsg").textContent = msg || "Sign in with your company email to load the latest numbers from Supabase. We'll email you a one-time sign-in link.";
-  document.getElementById("authEmail").focus();
-}
-async function sendLink(ev){
-  ev.preventDefault();
-  const email=document.getElementById("authEmail").value.trim(), btn=document.getElementById("authBtn");
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showAuth("Enter a valid email address."); return; }
-  btn.disabled=true; const sb=await getSB();
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
-  btn.disabled=false;
-  document.getElementById("authMsg").textContent = error ? "Couldn't send the link: "+error.message : `Sign-in link sent to ${email}. Open it on this device — the page will load live data automatically.`;
-}
-async function signOut(){ const sb=await getSB(); await sb.auth.signOut(); S.email=null; S.liveOn=false; S.stats=null; S.coh=null; S.camp={}; renderUser(); setSrc("snap",`Snapshot · through ${wlY(SNAP[SNAP.length-1].w)}`); document.getElementById("live").textContent="Load live data"; renderAll(); }
-function renderUser(){
-  const u=document.getElementById("user");
-  if(IN_CLAUDE || !S.email){ u.hidden=true; return; }
-  u.hidden=false; document.getElementById("userEmail").textContent=S.email;
-}
-async function initHosted(){
-  document.getElementById("authForm").addEventListener("submit",sendLink);
-  document.getElementById("signout").addEventListener("click",signOut);
-  const sb=await getSB(); if(!sb) return;
-  sb.auth.onAuthStateChange((ev,session)=>{ S.email=session&&session.user?session.user.email:null; renderUser();
-    if(ev==="SIGNED_IN" && !S.liveOn){ document.getElementById("auth").hidden=true; goLive(); } });
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){ S.email=session.user.email; renderUser(); goLive(); }
 }
 
 /* ---------- controls ---------- */
@@ -922,7 +837,6 @@ new MutationObserver(rerender).observe(document.documentElement,{attributes:true
 
 fillWeeks(); setSrc("snap",`Snapshot · through ${wlY(S.rows[S.rows.length-1].w)}`); renderAll(); redrawOnResize();
 
-if(!IN_CLAUDE) initHosted();
 /* auto-load live data when this viewer already allowed Supabase for the page */
 (async()=>{ try{ if(!window.claude) return; const p=await window.claude.use("permissions"); if(!p) return;
   const st=await p.state("mcp:"+SERVER).catch(()=>"unavailable"); if(st==="granted") goLive(); }catch(e){} })();
