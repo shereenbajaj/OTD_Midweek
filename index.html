@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OTD Ads Weekly Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#f3f5f8; --surface:#ffffff; --surface-2:#f8f9fb;
+  --ink:#101923; --ink-2:#465262; --muted:#6f7a88; --line:#e1e6ec; --grid:#edf0f4;
+  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.12); --accent-ink:#1c5cab;
+  --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300;
+  --good:#15804a; --good-soft:rgba(21,128,74,.10);
+  --bad:#c8372d; --bad-soft:rgba(200,55,45,.10);
+  --warn:#9a6400; --warn-soft:rgba(237,161,0,.14);
+  --shadow:0 1px 2px rgba(16,25,35,.05),0 2px 8px rgba(16,25,35,.04);
+  --sans:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0e1319; --surface:#161d26; --surface-2:#1b232d;
+    --ink:#edf1f5; --ink-2:#b4bdc8; --muted:#8b95a2; --line:#27313c; --grid:#212a34;
+    --accent:#3987e5; --accent-soft:rgba(57,135,229,.18); --accent-ink:#86b6ef;
+    --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+    --good:#43b57c; --good-soft:rgba(67,181,124,.14);
+    --bad:#ef6b61; --bad-soft:rgba(239,107,97,.14);
+    --warn:#e0a92e; --warn-soft:rgba(224,169,46,.16);
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0e1319; --surface:#161d26; --surface-2:#1b232d;
+  --ink:#edf1f5; --ink-2:#b4bdc8; --muted:#8b95a2; --line:#27313c; --grid:#212a34;
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.18); --accent-ink:#86b6ef;
+  --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+  --good:#43b57c; --good-soft:rgba(67,181,124,.14);
+  --bad:#ef6b61; --bad-soft:rgba(239,107,97,.14);
+  --warn:#e0a92e; --warn-soft:rgba(224,169,46,.16);
+  --shadow:none;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
+.num,td,.kv{font-variant-numeric:tabular-nums}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--ground) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-inline:-20px;padding:12px 20px}
+.bar-in{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.brand{display:flex;flex-direction:column;gap:1px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctl{display:flex;align-items:center;gap:6px}
+.ctl label{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 28px 6px 10px;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{border:0;background:transparent;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--ink-2);font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.src{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
+.src[data-s="live"] .dot{background:var(--good)}
+.src[data-s="loading"] .dot{background:var(--warn)}
+.src[data-s="error"] .dot{background:var(--bad)}
+
+/* sections */
+section{margin-top:28px}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+h2{font-size:16px;font-weight:700;margin:0;letter-spacing:-.005em}
+.sh p{margin:0;color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h3{font-size:13px;font-weight:600;margin:0 0 2px;color:var(--ink)}
+.card .sub{font-size:12px;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-main{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.g-fun{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.g-tip{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+@media (max-width:980px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g-main,.g-fun,.g-tip{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.g2,.g4{grid-template-columns:minmax(0,1fr)}.wrap{padding-inline:16px}.bar{margin-inline:-16px;padding-inline:16px}}
+
+/* summary strip */
+.summary{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin-top:18px}
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.brief ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;color:var(--ink-2)}
+.brief strong{color:var(--ink)}
+.brief .lead{font-size:15px;margin:0}
+
+/* KPI tiles */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px 10px;display:flex;flex-direction:column;gap:4px;min-width:0;box-shadow:var(--shadow)}
+.kpi .l{font-size:12px;color:var(--ink-2);font-weight:500}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.kpi .d .base{color:var(--muted)}
+.kpi.hero{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.chg{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chg.up{color:var(--good)} .chg.down{color:var(--bad)} .chg.flat{color:var(--muted)}
+.spark{width:100%;height:30px;display:block;margin-top:2px}
+
+/* charts */
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.ax{font-family:var(--mono);font-size:10.5px;fill:var(--muted)}
+.gridl{stroke:var(--grid);stroke-width:1}
+.base-l{stroke:var(--line);stroke-width:1}
+.ann-l{stroke:var(--warn);stroke-width:1;stroke-dasharray:3 3}
+.ann-t{font-family:var(--mono);font-size:10px;fill:var(--warn)}
+.endl{font-size:11px;fill:var(--ink-2);font-variant-numeric:tabular-nums}
+.sel-l{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:2 3;opacity:.6}
+.xh{stroke:var(--ink-2);stroke-width:1;opacity:.5}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:-4px 0 8px}
+.legend i{display:inline-block;width:14px;height:2px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important;height:2px}
+#tip{position:fixed;z-index:50;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.14);min-width:140px;max-width:280px}
+#tip .t{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:4px}
+#tip .r{display:flex;align-items:center;gap:8px;justify-content:space-between}
+#tip .r span:first-child{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+#tip .r b{font-variant-numeric:tabular-nums}
+#tip .k{width:10px;height:2px;border-radius:2px;display:inline-block}
+
+/* funnel */
+.funnel{display:grid;gap:6px}
+.fstep{display:grid;grid-template-columns:100px minmax(0,1fr) 108px;gap:10px;align-items:center}
+.fstep .fl{font-size:12.5px;color:var(--ink-2)}
+.fstep .ft{position:relative;height:26px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.fstep .fb{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:0 4px 4px 0;opacity:.85}
+.fstep .fg{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.fstep .fn{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fstep .fn.out{color:var(--ink)}
+.fstep .fr{font-size:12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fconv{display:grid;grid-template-columns:100px minmax(0,1fr) 108px;gap:10px;font-size:11.5px;color:var(--muted);margin:-2px 0}
+.fconv span:nth-child(2){font-family:var(--mono)}
+.fnote{font-size:12px;color:var(--muted);margin-top:10px}
+.fnote .gk{display:inline-block;width:2px;height:10px;background:var(--ink);vertical-align:middle;margin-right:4px}
+.stat-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.stat{display:flex;flex-direction:column}
+.stat .l{font-size:11.5px;color:var(--muted)}
+.stat .v{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-weight:500;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);position:sticky;top:0}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit;z-index:1}
+thead th:first-child{background:var(--surface-2);z-index:2}
+tbody tr{background:var(--surface)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.cur{background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+td.hi{background:var(--good-soft);color:var(--good)} td.lo{background:var(--bad-soft);color:var(--bad)}
+td.hi::after{content:" ▲";font-size:9px} td.lo::after{content:" ▼";font-size:9px}
+td.nm{text-align:left;white-space:normal;min-width:220px;max-width:340px}
+td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.tnote{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* campaigns */
+.movers{display:grid;gap:5px}
+.mv{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 72px;gap:10px;align-items:center;font-size:12px}
+.mv .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.mv .tr{position:relative;height:14px}
+.mv .tr::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line)}
+.mv .b{position:absolute;top:0;bottom:0;border-radius:3px}
+.mv .b.pos{left:50%;background:var(--good)} .mv .b.neg{right:50%;background:var(--bad)}
+.mv .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.mv .val.pos{color:var(--good)} .mv .val.neg{color:var(--bad)}
+.tcell{position:relative;min-height:420px}
+.tcard{position:absolute;inset:0;display:flex;flex-direction:column;padding:0;overflow:hidden}
+.tscroll{flex:1 1 auto;min-height:0;overflow:auto;border-top:1px solid var(--line)}
+@media (max-width:980px){.tcell{min-height:0}.tcard{position:static}.tscroll{max-height:480px}}
+.notice{border:1px dashed var(--line);border-radius:12px;padding:18px;background:var(--surface);color:var(--ink-2);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.notice p{margin:0;max-width:70ch}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.foot{margin-top:32px;font-size:12px;color:var(--muted);display:grid;gap:4px}
+.foot b{color:var(--ink-2);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.fb,.mv .b{transition:width .35s ease}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="bar-in">
+      <div class="brand">
+        <span class="eyebrow">Ketto · OTD · Ad campaigns</span>
+        <h1>Weekly Review</h1>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label for="wk">Week of</label><select id="wk"></select></div>
+        <div class="ctl"><label>Compare</label>
+          <div class="seg" id="cmp" role="group" aria-label="Compare against">
+            <button type="button" data-v="wow" aria-pressed="true">Last week</button>
+            <button type="button" data-v="4w" aria-pressed="false">4-wk avg</button>
+          </div>
+        </div>
+        <div class="ctl"><label>Trend</label>
+          <div class="seg" id="rng" role="group" aria-label="Trend range">
+            <button type="button" data-v="12" aria-pressed="false">12w</button>
+            <button type="button" data-v="26" aria-pressed="true">26w</button>
+            <button type="button" data-v="0" aria-pressed="false">All</button>
+          </div>
+        </div>
+        <span class="src" id="src" data-s="snap"><span class="dot"></span><span id="srcT">Snapshot</span></span>
+        <button type="button" class="btn" id="live">Load live data</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="summary"><div class="brief" id="brief"></div></div>
+
+  <section id="s-kpi">
+    <div class="sh"><h2>Headline</h2><p id="kpiSub"></p></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section id="s-rev">
+    <div class="sh"><h2>Donations &amp; traffic</h2><p>Bars are weekly donations (w/o tip); line is the 4-week moving average.</p></div>
+    <div class="grid g-main">
+      <div class="card"><h3>Donations per week</h3><p class="sub">₹, excluding tips</p>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Weekly donations</span><span style="color:var(--ink)"><i class="dash"></i>4-week average</span></div>
+        <div class="chart" id="cDon"></div></div>
+      <div class="grid" style="grid-template-rows:auto auto">
+        <div class="card"><h3>Traffic</h3><p class="sub">Campaign views and unique visitors</p>
+          <div class="legend"><span><i style="background:var(--accent)"></i>Views</span><span><i style="background:var(--s2)"></i>Unique visitors</span></div>
+          <div class="chart" id="cTraffic"></div></div>
+        <div class="card"><h3>Views per visitor</h3><p class="sub">Repeat viewing</p><div class="chart" id="cVpv"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-fun">
+    <div class="sh"><h2>Funnel</h2><p>Where visitors drop off between landing and a placed order.</p></div>
+    <div class="grid g-fun">
+      <div class="card"><h3 id="funT">Selected week</h3><p class="sub" id="funSub"></p>
+        <div class="funnel" id="funnel"></div>
+        <p class="fnote"><span class="gk"></span>marks the comparison period, scaled to this week's visitors.</p>
+        <div class="stat-row" id="funStats"></div>
+      </div>
+      <div class="card"><h3>Step conversion rates</h3><p class="sub">Each line is one step of the funnel, week by week</p>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Visitor → initiate</span><span><i style="background:var(--s2)"></i>Initiate → cart</span><span><i style="background:var(--s3)"></i>Cart → order</span><span><i style="background:var(--s4)"></i>Order → placed (payment success)</span></div>
+        <div class="chart" id="cSteps"></div></div>
+    </div>
+  </section>
+
+  <section id="s-val">
+    <div class="sh"><h2>Donor value</h2><p>What each visitor and each order is worth.</p></div>
+    <div class="grid g3">
+      <div class="card"><h3>Revenue per visitor</h3><p class="sub">Donations ÷ unique visitors, ₹</p><div class="chart" id="cRpv"></div></div>
+      <div class="card"><h3>Average ticket size</h3><p class="sub">Donations ÷ orders, ₹</p><div class="chart" id="cAts"></div></div>
+      <div class="card"><h3>Order conversion</h3><p class="sub">Orders ÷ unique visitors</p><div class="chart" id="cConv"></div></div>
+    </div>
+  </section>
+
+  <section id="s-tip">
+    <div class="sh"><h2>Tips</h2><p id="tipSub"></p></div>
+    <div class="grid g3">
+      <div class="card"><h3>Tip attach rate</h3><p class="sub">Orders with a tip ÷ orders</p><div class="chart" id="cAttach"></div></div>
+      <div class="card"><h3>Average tip</h3><p class="sub">Tip amount ÷ tipped orders, ₹</p><div class="chart" id="cAvgTip"></div></div>
+      <div class="card"><h3>Tip revenue</h3><p class="sub">₹ per week</p><div class="chart" id="cTip"></div></div>
+    </div>
+  </section>
+
+  <section id="s-camp">
+    <div class="sh"><h2>Campaigns</h2><p id="campSub">Which campaigns drove the week.</p></div>
+    <div id="campBody"></div>
+  </section>
+
+  <section id="s-coh">
+    <div class="sh"><h2>Launch-month cohorts</h2><p>Campaigns grouped by the month they started, so each month's launches can be compared fairly.</p></div>
+    <div id="cohBody"></div>
+  </section>
+
+  <section id="s-tbl">
+    <div class="sh"><h2>Weekly table</h2><p>Newest first. Shaded cells are 20%+ off their trailing 4-week average.</p></div>
+    <div class="tw"><table id="tbl"></table></div>
+  </section>
+
+  <div class="foot" id="foot">
+    <span><b>Source</b> Supabase · <code>otd_weekly_summary</code> (category = ad) and <code>otd_weekly_campaigns</code>. Weeks start Monday.</span>
+    <span><b>Definitions</b> Orders = orders placed. Donations exclude tips. All ratios are computed from raw counts, so they never drift from the underlying numbers.</span>
+    <span><b>Heads-up</b> Cart → order jumps from ~40% to ~80% from the week of 23 Feb while carts roughly halve — most likely a tracking change, not a real improvement.</span>
+  </div>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+const SNAP = [{"w":"2025-11-03","v":304807,"uv":186803,"don":6367183,"ord":5250,"donors":4972,"tipped":3813,"tip":347751,"ci":29051,"cart":17400,"oc":7603},{"w":"2025-11-10","v":284349,"uv":189717,"don":5871694,"ord":4715,"donors":4486,"tipped":3379,"tip":331778,"ci":30378,"cart":19469,"oc":6808},{"w":"2025-11-17","v":233620,"uv":142404,"don":4776636,"ord":3362,"donors":3173,"tipped":2362,"tip":269302,"ci":26673,"cart":15642,"oc":4959},{"w":"2025-11-24","v":255447,"uv":156706,"don":6320259,"ord":4413,"donors":4151,"tipped":3193,"tip":341129,"ci":29220,"cart":17220,"oc":6530},{"w":"2025-12-01","v":420603,"uv":234822,"don":8766764,"ord":7137,"donors":6725,"tipped":5338,"tip":513981,"ci":41115,"cart":19774,"oc":10615},{"w":"2025-12-08","v":255975,"uv":133346,"don":6870998,"ord":5376,"donors":5004,"tipped":3850,"tip":386217,"ci":28465,"cart":18489,"oc":7647},{"w":"2025-12-15","v":198612,"uv":100221,"don":5165742,"ord":3919,"donors":3672,"tipped":2866,"tip":290409,"ci":21881,"cart":14819,"oc":5538},{"w":"2025-12-22","v":231331,"uv":123040,"don":8758126,"ord":6222,"donors":5913,"tipped":4700,"tip":542461,"ci":28726,"cart":17474,"oc":8723},{"w":"2025-12-29","v":232615,"uv":122866,"don":6579343,"ord":4900,"donors":4596,"tipped":3583,"tip":397612,"ci":23091,"cart":13996,"oc":6947},{"w":"2026-01-05","v":274919,"uv":151312,"don":14109579,"ord":8378,"donors":7813,"tipped":6290,"tip":822259,"ci":34634,"cart":21397,"oc":12028},{"w":"2026-01-12","v":205814,"uv":113118,"don":8143508,"ord":5547,"donors":5268,"tipped":4100,"tip":486626,"ci":26666,"cart":16825,"oc":7964},{"w":"2026-01-19","v":190054,"uv":108492,"don":8193283,"ord":5036,"donors":4805,"tipped":3642,"tip":455778,"ci":24137,"cart":15341,"oc":7049},{"w":"2026-01-26","v":326782,"uv":143861,"don":9067844,"ord":6370,"donors":6045,"tipped":4476,"tip":509361,"ci":27368,"cart":17191,"oc":8963},{"w":"2026-02-02","v":322896,"uv":145977,"don":7720634,"ord":5377,"donors":5073,"tipped":3842,"tip":420959,"ci":23459,"cart":13446,"oc":7525},{"w":"2026-02-09","v":238085,"uv":119209,"don":10207494,"ord":6067,"donors":5787,"tipped":4406,"tip":600039,"ci":24510,"cart":14631,"oc":8491},{"w":"2026-02-16","v":224551,"uv":119382,"don":12434174,"ord":5501,"donors":5281,"tipped":3833,"tip":651155,"ci":21661,"cart":12442,"oc":7499},{"w":"2026-02-23","v":272825,"uv":146726,"don":12093240,"ord":7783,"donors":7442,"tipped":5639,"tip":645725,"ci":25292,"cart":13352,"oc":10600},{"w":"2026-03-02","v":421668,"uv":217679,"don":13368877,"ord":9453,"donors":8957,"tipped":7189,"tip":796325,"ci":34529,"cart":15860,"oc":13406},{"w":"2026-03-09","v":368912,"uv":197350,"don":13089884,"ord":9405,"donors":8783,"tipped":7411,"tip":834799,"ci":41175,"cart":17225,"oc":13944},{"w":"2026-03-16","v":228573,"uv":115824,"don":8335161,"ord":4945,"donors":4597,"tipped":3623,"tip":415871,"ci":18148,"cart":8708,"oc":6734},{"w":"2026-03-23","v":199227,"uv":100661,"don":7163000,"ord":4983,"donors":4742,"tipped":3519,"tip":397579,"ci":16604,"cart":8750,"oc":6781},{"w":"2026-03-30","v":174583,"uv":96964,"don":6523673,"ord":4099,"donors":3782,"tipped":2891,"tip":343983,"ci":14067,"cart":6982,"oc":5346},{"w":"2026-04-06","v":241761,"uv":149885,"don":12442213,"ord":7803,"donors":7464,"tipped":5900,"tip":771920,"ci":24076,"cart":12718,"oc":10698},{"w":"2026-04-13","v":236900,"uv":141611,"don":8647136,"ord":6285,"donors":5980,"tipped":4681,"tip":512098,"ci":21916,"cart":10381,"oc":8665},{"w":"2026-04-20","v":318654,"uv":170760,"don":7790050,"ord":4611,"donors":4267,"tipped":3270,"tip":419763,"ci":18377,"cart":7474,"oc":6220},{"w":"2026-04-27","v":301542,"uv":173398,"don":9337271,"ord":7231,"donors":6911,"tipped":5560,"tip":605119,"ci":26845,"cart":11837,"oc":10103},{"w":"2026-05-04","v":308168,"uv":191434,"don":10333218,"ord":8983,"donors":8496,"tipped":7026,"tip":693505,"ci":38722,"cart":14914,"oc":12576},{"w":"2026-05-11","v":229978,"uv":136793,"don":7918750,"ord":5593,"donors":5325,"tipped":4231,"tip":492762,"ci":21019,"cart":9776,"oc":7742},{"w":"2026-05-18","v":222181,"uv":131189,"don":9750074,"ord":6185,"donors":5770,"tipped":4579,"tip":567747,"ci":20197,"cart":10076,"oc":8571},{"w":"2026-05-25","v":261803,"uv":170845,"don":8226845,"ord":5215,"donors":4857,"tipped":3682,"tip":441114,"ci":25550,"cart":8669,"oc":7039},{"w":"2026-06-01","v":1132393,"uv":584253,"don":27286012,"ord":20898,"donors":20270,"tipped":16230,"tip":1751282,"ci":87886,"cart":31919,"oc":29348},{"w":"2026-06-08","v":439564,"uv":320462,"don":8674291,"ord":7102,"donors":6787,"tipped":5463,"tip":570315,"ci":50343,"cart":11928,"oc":10346},{"w":"2026-06-15","v":435192,"uv":342727,"don":9391692,"ord":7523,"donors":7213,"tipped":5806,"tip":613436,"ci":71848,"cart":12980,"oc":10984},{"w":"2026-06-22","v":281956,"uv":213332,"don":7000926,"ord":5707,"donors":5420,"tipped":4263,"tip":453031,"ci":40459,"cart":9891,"oc":8054},{"w":"2026-06-29","v":284358,"uv":196089,"don":13331094,"ord":10222,"donors":9780,"tipped":7705,"tip":832892,"ci":34563,"cart":16074,"oc":14352},{"w":"2026-07-06","v":250321,"uv":179579,"don":9071854,"ord":6975,"donors":6573,"tipped":5026,"tip":537592,"ci":25046,"cart":11614,"oc":9544},{"w":"2026-07-13","v":254791,"uv":178503,"don":10985438,"ord":8991,"donors":8636,"tipped":6601,"tip":662949,"ci":29281,"cart":14114,"oc":12425},{"w":"2026-07-20","v":159604,"uv":112690,"don":6539100,"ord":4887,"donors":4588,"tipped":3509,"tip":387944,"ci":16179,"cart":8450,"oc":6729},{"w":"2026-07-27","v":220857,"uv":162294,"don":10280924,"ord":7903,"donors":7508,"tipped":6017,"tip":636228,"ci":25523,"cart":13206,"oc":10942},{"w":"2026-08-03","v":217693,"uv":159012,"don":9275510,"ord":6784,"donors":6419,"tipped":5078,"tip":565222,"ci":25119,"cart":11321,"oc":9411},{"w":"2026-08-10","v":214850,"uv":162190,"don":6778246,"ord":6005,"donors":5663,"tipped":4618,"tip":480872,"ci":25131,"cart":10442,"oc":8730},{"w":"2026-08-17","v":160376,"uv":115197,"don":9270975,"ord":7067,"donors":6754,"tipped":5389,"tip":590034,"ci":24032,"cart":11925,"oc":9882},{"w":"2026-08-24","v":110819,"uv":78774,"don":6921089,"ord":4942,"donors":4652,"tipped":3715,"tip":442755,"ci":16030,"cart":8718,"oc":6949},{"w":"2026-08-31","v":100813,"uv":67545,"don":8109384,"ord":6014,"donors":5590,"tipped":4339,"tip":471882,"ci":16720,"cart":10338,"oc":7860},{"w":"2026-09-07","v":124149,"uv":87734,"don":7251815,"ord":6068,"donors":5773,"tipped":4564,"tip":463145,"ci":18090,"cart":10401,"oc":8256},{"w":"2026-09-14","v":116234,"uv":85040,"don":6055801,"ord":4484,"donors":4262,"tipped":3358,"tip":384350,"ci":15137,"cart":8273,"oc":6172}];
+const PROJECT = "njgctrmitailbvjtyeiz";
+const SERVER = "Supabase", TOOL = "execute_sql";
+const ANN = [{w:"2026-02-23", t:"cart tracking change?"}];
+
+/* ---------- formatting ---------- */
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dt = w => new Date(w+"T00:00:00");
+const wl = w => { const d=dt(w); return d.getDate()+" "+MON[d.getMonth()]; };
+const wlY = w => { const d=dt(w); return d.getDate()+" "+MON[d.getMonth()]+" "+String(d.getFullYear()).slice(2); };
+const inr = v => { if(v==null||!isFinite(v)) return "–"; const a=Math.abs(v);
+  if(a>=1e7) return "₹"+(v/1e7).toFixed(2)+" Cr";
+  if(a>=1e5) return "₹"+(v/1e5).toFixed(a>=1e6?1:2)+" L";
+  return "₹"+Math.round(v).toLocaleString("en-IN"); };
+const inrS = v => { const a=Math.abs(v); if(a>=1e7) return "₹"+(v/1e7).toFixed(1)+"Cr"; if(a>=1e5) return "₹"+Math.round(v/1e5)+"L"; if(a>=1e3) return "₹"+Math.round(v/1e3)+"k"; return "₹"+Math.round(v); };
+const int = v => v==null||!isFinite(v) ? "–" : Math.round(v).toLocaleString("en-IN");
+const intS = v => { const a=Math.abs(v); if(a>=1e6) return (v/1e6).toFixed(1)+"M"; if(a>=1e3) return Math.round(v/1e3)+"k"; return String(Math.round(v)); };
+const pct = (v,d=1) => v==null||!isFinite(v) ? "–" : (v*100).toFixed(d)+"%";
+const rs = v => v==null||!isFinite(v) ? "–" : "₹"+Math.round(v).toLocaleString("en-IN");
+const rs2 = v => v==null||!isFinite(v) ? "–" : "₹"+v.toFixed(1);
+const x2 = v => v==null||!isFinite(v) ? "–" : v.toFixed(2);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- metrics ---------- */
+const RAW = ["v","uv","don","ord","donors","tipped","tip","ci","cart","oc"];
+function derive(r){
+  const q=(a,b)=>b?a/b:null;
+  return Object.assign(r,{
+    rpv:q(r.don,r.uv), rpd:q(r.don,r.donors), conv:q(r.ord,r.uv), ats:q(r.don,r.ord), opd:q(r.ord,r.donors), vpv:q(r.v,r.uv),
+    ir:q(r.ci,r.uv), i2c:q(r.cart,r.ci), c2o:q(r.oc,r.cart), o2p:q(r.ord,r.oc), i2p:q(r.ord,r.ci),
+    attach:q(r.tipped,r.ord), avgtip:q(r.tip,r.tipped), tippct:q(r.tip,r.don)
+  });
+}
+const M = {
+  don:{l:"Donations (w/o tip)",f:inr,fs:inrS}, ord:{l:"Orders placed",f:int,fs:intS}, donors:{l:"Unique donors",f:int,fs:intS},
+  rpv:{l:"Revenue per visitor",f:rs2,fs:v=>"₹"+Math.round(v)}, rpd:{l:"Revenue per donor",f:rs,fs:v=>"₹"+intS(v)}, conv:{l:"Order conversion",f:v=>pct(v,2),fs:v=>pct(v,1)},
+  ats:{l:"Avg ticket size",f:rs,fs:v=>"₹"+intS(v)}, tip:{l:"Tip revenue",f:inr,fs:inrS},
+  v:{l:"Campaign views",f:int,fs:intS}, uv:{l:"Unique visitors",f:int,fs:intS}, vpv:{l:"Views per visitor",f:x2,fs:x2},
+  ir:{l:"Visitor → initiate",f:pct,fs:v=>pct(v,0)}, i2c:{l:"Initiate → cart",f:pct,fs:v=>pct(v,0)},
+  c2o:{l:"Cart → order",f:pct,fs:v=>pct(v,0)}, o2p:{l:"Order → placed",f:pct,fs:v=>pct(v,0)}, i2p:{l:"Initiate → placed",f:pct,fs:v=>pct(v,0)},
+  attach:{l:"Tip attach rate",f:pct,fs:v=>pct(v,0)}, avgtip:{l:"Average tip",f:rs,fs:v=>"₹"+Math.round(v)}, tippct:{l:"Tips as % of donations",f:pct,fs:pct},
+  opd:{l:"Orders per donor",f:x2,fs:x2}, ci:{l:"Contribution initiated",f:int,fs:intS}, cart:{l:"Cart created",f:int,fs:intS}, oc:{l:"Order created",f:int,fs:intS}
+};
+
+/* ---------- state ---------- */
+const S = { rows:[], sel:0, cmp:"wow", rng:26, live:"snap", mcp:null, stats:null, statsErr:null, camp:{}, campErr:{}, campLoading:{} };
+function setRows(list){ S.rows = list.map(r=>derive(Object.assign({},r))).sort((a,b)=>a.w<b.w?-1:1); }
+setRows(SNAP);
+S.sel = S.rows.length-1;
+
+function baseline(i){
+  if(S.cmp==="wow"){ return i>0 ? S.rows[i-1] : null; }
+  const from=Math.max(0,i-4); if(from>=i) return null;
+  const agg={w:"avg"}; RAW.forEach(k=>agg[k]=0);
+  for(let j=from;j<i;j++) RAW.forEach(k=>agg[k]+=S.rows[j][k]);
+  const n=i-from; RAW.forEach(k=>agg[k]/=n); return derive(agg);
+}
+const nPrior = () => Math.min(4,S.sel);
+const cmpLabel = () => S.cmp==="wow" ? "vs last week" : (nPrior()<4 ? `vs avg of prior ${nPrior()} wk` : "vs 4-wk avg");
+function winIdx(){ const e=S.sel; const s = S.rng? Math.max(0,e-S.rng+1) : 0; return [s,e]; }
+function change(cur,base){ if(cur==null||base==null||!base) return null; return cur/base-1; }
+function chgHTML(c, rate){ // rate: show pts instead of %
+  if(c==null) return '<span class="chg flat">–</span>';
+  const cls = Math.abs(c)<0.005 ? "flat" : (c>0?"up":"down");
+  const arrow = cls==="flat"?"●":(c>0?"▲":"▼");
+  return `<span class="chg ${cls}">${arrow} ${Math.abs(c*100).toFixed(Math.abs(c)<0.1?1:0)}%</span>`;
+}
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById("tip");
+function showTip(ev, title, rows){
+  tip.replaceChildren();
+  const t=document.createElement("div"); t.className="t"; t.textContent=title; tip.appendChild(t);
+  rows.forEach(r=>{ const d=document.createElement("div"); d.className="r";
+    const a=document.createElement("span"); if(r.c){const k=document.createElement("i"); k.className="k"; k.style.background=r.c; a.appendChild(k);} a.appendChild(document.createTextNode(r.l));
+    const b=document.createElement("b"); b.textContent=r.v; d.append(a,b); tip.appendChild(d); });
+  tip.hidden=false;
+  const pad=14, w=tip.offsetWidth, h=tip.offsetHeight;
+  let x=ev.clientX+pad, y=ev.clientY+pad;
+  if(x+w>innerWidth-8) x=ev.clientX-w-pad; if(y+h>innerHeight-8) y=ev.clientY-h-pad;
+  tip.style.left=Math.max(8,x)+"px"; tip.style.top=Math.max(8,y)+"px";
+}
+const hideTip=()=>{tip.hidden=true;};
+addEventListener("scroll",hideTip,{passive:true}); addEventListener("blur",hideTip);
+
+/* ---------- svg helpers ---------- */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+function niceTicks(min,max,n=4){
+  if(min===max){ max=min+1; }
+  const span=max-min, step0=span/n, mag=Math.pow(10,Math.floor(Math.log10(step0))), err=step0/mag;
+  const step = (err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;
+  const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step, t=[];
+  for(let v=lo; v<=hi+step*1e-9; v+=step) t.push(+v.toFixed(10));
+  return t;
+}
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* Time-series chart: bars (optional) + lines on one axis */
+function tsChart(host, cfg){
+  host._cfg=cfg; host.replaceChildren();
+  const W=Math.max(260, host.clientWidth||600), H=cfg.h||200, m={t:10,r:cfg.mr||12,b:cfg.noX?6:22,l:cfg.ml||48};
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,height:H,role:"img","aria-label":cfg.aria||""},host);
+  const n=cfg.x.length; if(!n) return;
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const band=iw/n, xc=i=>m.l+band*(i+.5);
+  let vals=[]; (cfg.bars?[cfg.bars]:[]).concat(cfg.lines||[]).forEach(s=>s.vals.forEach(v=>{if(v!=null&&isFinite(v)) vals.push(v);}));
+  let lo=Math.min(...vals), hi=Math.max(...vals);
+  if(cfg.zero||cfg.bars) lo=0; else { const p=(hi-lo)*.15||hi*.1; lo=Math.max(0,lo-p); hi=hi+p*.5; }
+  const ticks=niceTicks(lo,hi,cfg.ticks||4); const y0=ticks[0], y1=ticks[ticks.length-1];
+  const y=v=>m.t+ih-(v-y0)/(y1-y0)*ih;
+  ticks.forEach(t=>{ el("line",{x1:m.l,x2:W-m.r,y1:y(t),y2:y(t),class:"gridl"},svg);
+    const tx=el("text",{x:m.l-8,y:y(t)+3.5,"text-anchor":"end",class:"ax"},svg); tx.textContent=cfg.fy(t); });
+  // x labels
+  const every=Math.max(1,Math.ceil(n/(W<420?4:7)));
+  if(!cfg.noX) for(let i=n-1;i>=0;i-=every){ const tx=el("text",{x:xc(i),y:H-6,"text-anchor":"middle",class:"ax"},svg); tx.textContent=(cfg.xf||wl)(cfg.x[i]); }
+  // annotations
+  (cfg.ann||[]).forEach(a=>{ const i=cfg.x.indexOf(a.w); if(i<0) return; const X=xc(i)-band/2;
+    el("line",{x1:X,x2:X,y1:m.t,y2:m.t+ih,class:"ann-l"},svg);
+    const tx=el("text",{x:X+4,y:m.t+9,class:"ann-t"},svg); tx.textContent=a.t; });
+  if(cfg.ref!=null){ el("line",{x1:m.l,x2:W-m.r,y1:y(cfg.ref),y2:y(cfg.ref),stroke:cssVar("--ink-2"),"stroke-width":1,"stroke-dasharray":"2 3",opacity:.7},svg); }
+  // selected week marker
+  if(cfg.sel!=null && cfg.sel>=0 && !cfg.bars){ el("line",{x1:xc(cfg.sel),x2:xc(cfg.sel),y1:m.t,y2:m.t+ih,class:"sel-l"},svg); }
+  // bars
+  if(cfg.bars){ const bw=Math.max(2,Math.min(22,band-2));
+    cfg.bars.vals.forEach((v,i)=>{ if(v==null) return; const top=y(v), h=Math.max(0,m.t+ih-top); const r=Math.min(4,bw/2,h);
+      const x=xc(i)-bw/2, b=m.t+ih;
+      el("path",{d:`M${x},${b}V${top+r}Q${x},${top} ${x+r},${top}H${x+bw-r}Q${x+bw},${top} ${x+bw},${top+r}V${b}Z`,fill:cfg.bars.color,opacity:i===cfg.sel?1:.55},svg); });
+  }
+  // lines
+  (cfg.lines||[]).forEach((s,si)=>{
+    let d="", started=false;
+    s.vals.forEach((v,i)=>{ if(v==null||!isFinite(v)){started=false;return;} d+=(started?"L":"M")+xc(i).toFixed(1)+","+y(v).toFixed(1); started=true; });
+    if(s.area && (cfg.lines.length===1)){
+      const idx=s.vals.map((v,i)=>v==null?null:i).filter(i=>i!=null);
+      if(idx.length>1){ const a=d+`L${xc(idx[idx.length-1]).toFixed(1)},${m.t+ih}L${xc(idx[0]).toFixed(1)},${m.t+ih}Z`; el("path",{d:a,fill:s.color,opacity:.10},svg); }
+    }
+    el("path",{d,fill:"none",stroke:s.color,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round","stroke-dasharray":s.dash?"5 4":"none"},svg);
+    // endpoint / selected dot
+    let di = cfg.sel!=null ? cfg.sel : s.vals.length-1; if(cfg.sel==null){ while(di>0 && s.vals[di]==null) di--; }
+    if(!s.dash && s.vals[di]!=null) el("circle",{cx:xc(di),cy:y(s.vals[di]),r:4,fill:s.color,stroke:cssVar("--surface"),"stroke-width":2},svg);
+  });
+  if(cfg.endLabels){ const di=cfg.sel!=null?cfg.sel:n-1;
+    const L=(cfg.lines||[]).map(s=>({s,v:s.vals[di],y:s.vals[di]==null?null:y(s.vals[di])})).filter(o=>o.y!=null).sort((a,b)=>a.y-b.y);
+    for(let k=1;k<L.length;k++) if(L[k].y-L[k-1].y<13) L[k].y=L[k-1].y+13;
+    L.forEach(o=>{ const X=W-m.r+8; el("line",{x1:X,x2:X+10,y1:o.y,y2:o.y,stroke:o.s.color,"stroke-width":2,"stroke-linecap":"round"},svg);
+      const tx=el("text",{x:X+14,y:o.y+3.5,class:"endl"},svg); tx.textContent=cfg.endFmt?cfg.endFmt(o):pct(o.v,0)+" "+o.s.name.split(" → ")[1]; });
+  }
+  el("line",{x1:m.l,x2:W-m.r,y1:m.t+ih,y2:m.t+ih,class:"base-l"},svg);
+  // hover
+  const xh=el("line",{x1:0,x2:0,y1:m.t,y2:m.t+ih,class:"xh",visibility:"hidden"},svg);
+  const ov=el("rect",{x:m.l,y:m.t,width:iw,height:ih,fill:"transparent"},svg);
+  const series=(cfg.bars?[cfg.bars]:[]).concat(cfg.lines||[]);
+  ov.addEventListener("pointermove",ev=>{
+    const r=svg.getBoundingClientRect(); const px=(ev.clientX-r.left)*(W/r.width);
+    const i=Math.max(0,Math.min(n-1,Math.floor((px-m.l)/band)));
+    xh.setAttribute("x1",xc(i)); xh.setAttribute("x2",xc(i)); xh.setAttribute("visibility","visible");
+    showTip(ev,cfg.tt?cfg.tt(cfg.x[i]):"Week of "+wlY(cfg.x[i]), series.map(s=>({l:s.name,v:s.raw?(s.raw[i]==null?"–":s.rf(s.raw[i])+"  ·  "+Math.round(s.vals[i])):(s.f||cfg.ft||cfg.fy)(s.vals[i]),c:s.color})).concat(cfg.extra?cfg.extra(i):[]));
+  });
+  ov.addEventListener("pointerleave",()=>{xh.setAttribute("visibility","hidden");hideTip();});
+}
+function redrawOnResize(){ const ro=new ResizeObserver(es=>{ es.forEach(e=>{ const h=e.target; if(h._cfg && Math.abs((h._w||0)-h.clientWidth)>4){ h._w=h.clientWidth; h._draw? h._draw(): tsChart(h,h._cfg);} }); });
+  document.querySelectorAll(".chart").forEach(c=>{c._w=c.clientWidth; ro.observe(c);}); }
+
+function spark(vals, color){
+  const W=160,H=30, v=vals.filter(x=>x!=null&&isFinite(x)); if(v.length<2) return "";
+  const lo=Math.min(...v), hi=Math.max(...v), rg=(hi-lo)||1;
+  const pts=vals.map((x,i)=>[i/(vals.length-1)*(W-6)+3, H-4-((x-lo)/rg)*(H-8)]);
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join("");
+  const a=d+`L${pts[pts.length-1][0]},${H}L${pts[0][0]},${H}Z`; const e=pts[pts.length-1];
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${a}" fill="${color}" opacity=".10"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="${e[0]}" cy="${e[1]}" r="2.6" fill="${color}"/></svg>`;
+}
+
+/* ---------- render: brief + KPIs ---------- */
+function renderBrief(){
+  const r=S.rows[S.sel], b=baseline(S.sel), box=document.getElementById("brief");
+  if(!b){ box.innerHTML=`<p class="lead"><strong>Week of ${wlY(r.w)}</strong> — first week in the data, nothing to compare against yet.</p>`; return; }
+  const c=change(r.don,b.don);
+  const dir = c==null?"":(c>=0?"up":"down");
+  const drivers=["uv","rpv","conv","ats","ir","i2c","c2o","o2p","attach"].map(k=>({k,c:change(r[k],b[k])})).filter(x=>x.c!=null).sort((a,b)=>Math.abs(b.c)-Math.abs(a.c)).slice(0,3);
+  const li=drivers.map(d=>`<li><strong>${esc(M[d.k].l)}</strong> ${M[d.k].f(r[d.k])} (${M[d.k].f(b[d.k])} ${cmpLabel().replace("vs ","")}) ${chgHTML(d.c)}</li>`).join("");
+  box.innerHTML=`<p class="lead"><strong>Week of ${wlY(r.w)}:</strong> ${inr(r.don)} donated from ${int(r.ord)} orders — ${dir} ${Math.abs(c*100).toFixed(Math.abs(c)<0.1?1:0)}% ${cmpLabel()}. Biggest moves:</p><ul>${li}</ul>`;
+}
+function renderKPIs(){
+  const keys=["don","ord","donors","rpv","conv","ats","tip"];
+  const r=S.rows[S.sel], b=baseline(S.sel); const s=Math.max(0,S.sel-11);
+  document.getElementById("kpiSub").textContent=`Week of ${wlY(r.w)} · change ${cmpLabel()} · trend = last 12 weeks`;
+  const acc=cssVar("--accent");
+  document.getElementById("kpis").innerHTML=keys.map((k,i)=>{
+    const c=b?change(r[k],b[k]):null; const vals=S.rows.slice(s,S.sel+1).map(x=>x[k]);
+    return `<div class="kpi${i===0?" hero":""}"><span class="l">${M[k].l}</span><span class="v">${M[k].f(r[k])}</span>
+      <span class="d">${chgHTML(c)}<span class="base">${b?M[k].f(b[k]):""}</span></span>${spark(vals,acc)}</div>`;
+  }).join("");
+}
+
+/* ---------- render: charts ---------- */
+function series(k,s,e){ return S.rows.slice(s,e+1).map(r=>r[k]); }
+function ma4(s,e){ return S.rows.slice(s,e+1).map((r,j)=>{ const i=s+j; if(i<3) return null; let t=0; for(let q=i-3;q<=i;q++) t+=S.rows[q].don; return t/4; }); }
+function renderCharts(){
+  const [s,e]=winIdx(), x=S.rows.slice(s,e+1).map(r=>r.w), sel=e-s;
+  const A=cssVar("--accent"), B=cssVar("--s2"), INK=cssVar("--ink");
+  tsChart(document.getElementById("cDon"),{x,sel,h:250,fy:inrS,ft:inr,bars:{name:"Donations",vals:series("don",s,e),color:A},
+    lines:[{name:"4-wk avg",vals:ma4(s,e),color:INK,dash:true}],
+    extra:i=>[{l:"Orders",v:int(S.rows[s+i].ord)}], aria:"Weekly donations bar chart"});
+  tsChart(document.getElementById("cTraffic"),{x,sel,h:150,zero:true,fy:intS,ft:int,lines:[{name:"Views",vals:series("v",s,e),color:A},{name:"Unique visitors",vals:series("uv",s,e),color:B}]});
+  tsChart(document.getElementById("cVpv"),{x,sel,h:110,ticks:3,fy:x2,lines:[{name:"Views / visitor",vals:series("vpv",s,e),color:A,area:true}]});
+  const one=(id,k,f,ft,extra)=>tsChart(document.getElementById(id),Object.assign({x,sel,h:170,fy:f,ft:ft||f,lines:[{name:M[k].l,vals:series(k,s,e),color:A,area:true}]},extra||{}));
+  one("cRpv","rpv",v=>"₹"+Math.round(v),rs2);
+  one("cAts","ats",v=>"₹"+(v/1000).toFixed(1)+"k",rs);
+  one("cConv","conv",v=>pct(v,1),v=>pct(v,2));
+  one("cAttach","attach",v=>pct(v,0),pct);
+  one("cAvgTip","avgtip",v=>"₹"+Math.round(v),rs);
+  tsChart(document.getElementById("cTip"),{x,sel,h:170,fy:inrS,ft:inr,bars:{name:"Tip revenue",vals:series("tip",s,e),color:A}});
+  // funnel step rates: one chart, four lines
+  const STEP=[["ir","--accent"],["i2c","--s2"],["c2o","--s3"],["o2p","--s4"]];
+  tsChart(document.getElementById("cSteps"),{x,sel,h:300,zero:true,ticks:5,mr:118,fy:v=>pct(v,0),ft:pct,ann:ANN,endLabels:true,
+    lines:STEP.map(([k,c])=>({name:M[k].l,vals:series(k,s,e),color:cssVar(c)}))});
+  const r=S.rows[S.sel];
+  document.getElementById("tipSub").textContent=`Tips added ${pct(r.tippct)} on top of donations in the week of ${wl(r.w)} · orders per donor ${x2(r.opd)}`;
+}
+
+/* ---------- render: funnel ---------- */
+function renderFunnel(){
+  const r=S.rows[S.sel], b=baseline(S.sel);
+  document.getElementById("funT").textContent="Week of "+wlY(r.w);
+  document.getElementById("funSub").textContent=b?`Bar = this week · tick = ${cmpLabel().replace("vs ","")} at this week's traffic`:"";
+  const st=[["uv","Unique visitors"],["ci","Initiated"],["cart","Cart created"],["oc","Order created"],["ord","Order placed"]];
+  const rates=[null,"ir","i2c","c2o","o2p"];
+  const max=r.uv;
+  let h="";
+  st.forEach(([k,l],i)=>{
+    if(i>0){ const rk=rates[i]; const c=b?change(r[rk],b[rk]):null;
+      h+=`<div class="fconv"><span></span><span>↓ ${pct(r[rk])} ${b?"· was "+pct(b[rk]):""}</span><span style="text-align:right">${chgHTML(c)}</span></div>`; }
+    const w=Math.max(.4,r[k]/max*100);
+    // ghost: baseline share of its visitors, scaled to this week's visitors
+    const g=b? Math.min(100,(b[k]/b.uv)*100) : null;
+    const inside=w>22;
+    h+=`<div class="fstep"><span class="fl">${l}</span><div class="ft" title="${l}"><div class="fb" style="width:${w}%"></div>${g!=null&&i>0?`<div class="fg" style="left:calc(${g}% - 1px)"></div>`:""}<span class="fn${inside?"":" out"}" style="${inside?"":`left:calc(${Math.max(w, g!=null&&i>0?g:0)}% + 8px)`}">${int(r[k])}</span></div><span class="fr">${pct(r[k]/max,i?2:0)} <span style="color:var(--muted)">of UV</span></span></div>`;
+  });
+  document.getElementById("funnel").innerHTML=h;
+  const i2p=change(r.i2p,b&&b.i2p);
+  document.getElementById("funStats").innerHTML=
+    `<div class="stat"><span class="l">Initiate → placed</span><span class="v">${pct(r.i2p)}</span>${chgHTML(i2p)}</div>`+
+    `<div class="stat"><span class="l">Visitor → placed</span><span class="v">${pct(r.conv,2)}</span>${chgHTML(b?change(r.conv,b.conv):null)}</div>`+
+    `<div class="stat"><span class="l">Drop-offs this week</span><span class="v">${int(r.ci-r.ord)}</span><span class="chg flat">initiated, not placed</span></div>`;
+}
+
+/* ---------- render: weekly table ---------- */
+function renderTable(){
+  const cols=["don","ord","donors","v","uv","rpv","conv","ats","ir","i2c","c2o","o2p","attach","avgtip","tip"];
+  const [s,e]=winIdx();
+  let h="<thead><tr><th>Week</th>"+cols.map(k=>`<th>${esc(M[k].l)}</th>`).join("")+"</tr></thead><tbody>";
+  for(let i=e;i>=s;i--){ const r=S.rows[i];
+    h+=`<tr class="${i===S.sel?"cur":""}"><td>${wlY(r.w)}</td>`+cols.map(k=>{
+      let cls=""; if(i>=4){ let a=0; for(let j=i-4;j<i;j++) a+=S.rows[j][k]; a/=4; const d=a?r[k]/a-1:0; if(d>=.2) cls="hi"; else if(d<=-.2) cls="lo"; }
+      return `<td class="${cls}">${M[k].f(r[k])}</td>`; }).join("")+"</tr>"; }
+  document.getElementById("tbl").innerHTML=h+"</tbody>";
+}
+
+/* ---------- campaigns ---------- */
+function campMsg(html){ document.getElementById("campBody").innerHTML=html; }
+function renderCampaigns(){
+  const r=S.rows[S.sel], w=r.w;
+  if(!S.mcp){
+    campMsg(`<div class="notice"><p>Campaign drill-down (top campaigns, movers and traffic-vs-value) reads <code>otd_weekly_campaigns</code> straight from Supabase. Load live data to see it.</p><button type="button" class="btn primary" data-act="live">Load live data</button></div>`); return;
+  }
+  if(S.statsErr){ campMsg(`<div class="notice"><p>${esc(S.statsErr)}</p><button type="button" class="btn" data-act="live">Try again</button></div>`); return; }
+  if(!S.stats){ campMsg(`<div class="notice"><p>Loading campaign data…</p></div>`); return; }
+  const st=S.stats[w];
+  const avail=Object.keys(S.stats).sort(); const complete=avail.filter(k=>{const row=S.rows.find(x=>x.w===k); return row && S.stats[k].tot>=row.don*.9;});
+  const latest=complete[complete.length-1];
+  if(!st){
+    campMsg(`<div class="notice"><p>No campaign-level rows for the week of ${wlY(w)}. Campaign data covers ${wl(avail[0])} – ${wlY(avail[avail.length-1])}${latest?`; the latest complete week is ${wlY(latest)}`:""}.</p>${latest?`<button type="button" class="btn primary" data-act="goto" data-w="${latest}">Show week of ${wl(latest)}</button>`:""}</div>`); return;
+  }
+  const cov=st.tot/r.don;
+  if(S.campErr[w]){ campMsg(`<div class="notice"><p>${esc(S.campErr[w])}</p><button type="button" class="btn" data-act="retry">Try again</button></div>`); return; }
+  const rows=S.camp[w];
+  if(!rows){ campMsg(`<div class="notice"><p>Loading campaigns for the week of ${wlY(w)}…</p></div>`); loadCamp(w); return; }
+  const tot=rows.reduce((a,c)=>a+c.d,0)||1;
+  const top=rows.filter(c=>c.d>0);
+  const movers=rows.map(c=>Object.assign({dd:c.d-c.pd},c)).filter(c=>c.dd!==0).sort((a,b)=>b.dd-a.dd);
+  const gain=movers.filter(c=>c.dd>0).slice(0,6), lose=movers.filter(c=>c.dd<0).slice(-6).reverse();
+  const mx=Math.max(1,...gain.map(c=>c.dd),...lose.map(c=>-c.dd));
+  const prevW=S.rows[S.sel-1]&&S.stats[S.rows[S.sel-1].w];
+  const statTile=(l,v,sub)=>`<div class="kpi"><span class="l">${l}</span><span class="v">${v}</span><span class="d"><span class="base">${sub}</span></span></div>`;
+  const covPill = cov<.9?`<span class="pill">Partial week · ${pct(cov,0)} of summary donations</span>`:`<span class="pill ok">Complete · ${pct(cov,0)} of summary</span>`;
+  const mvRow=c=>{ const w2=Math.abs(c.dd)/mx*50; const cls=c.dd>0?"pos":"neg";
+    return `<div class="mv"><span class="n" title="${esc(c.nm||c.id)}">${esc(c.nm||("Campaign "+c.id))}</span><span class="tr"><span class="b ${cls}" style="width:${w2}%"></span></span><span class="val ${cls}">${c.dd>0?"+":"−"}${inrS(Math.abs(c.dd))}</span></div>`; };
+  document.getElementById("campBody").innerHTML=`
+    <p style="margin:0 0 10px">${covPill}</p>
+    <div class="kpis" style="margin-bottom:12px">
+      ${statTile("Campaigns with donations",int(st.n_don),prevW?`${int(prevW.n_don)} last week`:"")}
+      ${statTile("Top-10 share of donations",pct(st.top10/st.tot,0),prevW?`${pct(prevW.top10/prevW.tot,0)} last week`:"")}
+      ${statTile("New campaigns this week",int(st.n_new),`${int(st.n_live)} campaigns got views`)}
+    </div>
+    <div class="grid g-main camp-row">
+      <div class="tcell"><div class="card tcard"><div style="padding:14px 16px 8px;flex:none"><h3>Campaigns by donations</h3><p class="sub" style="margin:0">All ${top.length} campaigns with donations, week of ${wlY(w)} · scroll for more</p></div>
+        <div class="tscroll"><table><thead><tr><th>Campaign</th><th>This week</th><th>Total since ${wl(avail[0])}</th><th>vs last wk</th><th>Share</th><th>Visitors</th><th>Rev / visitor</th><th>Conversion</th></tr></thead><tbody>
+        ${top.map(c=>`<tr><td class="nm">${esc(c.nm||"Campaign "+c.id)}<small>#${esc(c.id)}</small></td><td>${inr(c.d)}</td><td>${c.tot==null?"–":inr(c.tot)}${c.fw===avail[0]?' <span class="pill" title="In the data from the first available week — earlier donations are not in Supabase">*</span>':""}</td><td>${c.pd?chgHTML(c.d/c.pd-1):'<span class="pill ok">New</span>'}</td><td>${pct(c.d/tot,0)}</td><td>${int(c.uv)}</td><td>${c.uv?rs(c.d/c.uv):"–"}</td><td>${c.uv?pct(c.op/c.uv,1):"–"}</td></tr>`).join("")}
+        </tbody></table></div>
+        ${(()=>{ const f=top.filter(c=>c.fw===avail[0]).length; return `<p class="tnote" style="padding:8px 16px 12px;margin:0;flex:none;border-top:1px solid var(--line)">Total = ad donations from ${wl(avail[0])} (earliest week in Supabase) to this week.${f?` <span class="pill">*</span> ${f} campaign${f>1?"s":""} already had donations on ${wl(avail[0])}, so ${f>1?"their totals":"its total"} may miss earlier donations not in Supabase.`:""}</p>`; })()}
+      </div></div>
+      <div class="grid">
+        <div class="card"><h3>Biggest movers</h3><p class="sub">Change in donations vs last week</p>
+          <div class="movers">${gain.map(mvRow).join("")}${lose.map(mvRow).join("")}</div></div>
+        <div class="card"><h3>Top-10 concentration</h3><p class="sub">Share of donations from the 10 biggest campaigns</p><div class="chart" id="cConc"></div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Traffic vs value</h3><p class="sub">Each dot is a campaign. Right = more visitors (log scale), up = more revenue per visitor. Lower-right: lots of traffic, weak monetisation — fix or cut. Upper-left: strong monetisation, little traffic — scale.</p><div class="chart" id="cScatter"></div></div>`;
+  // concentration chart
+  const ws=avail; const ch=document.getElementById("cConc");
+  tsChart(ch,{x:ws,sel:ws.indexOf(w),h:130,ticks:3,fy:v=>pct(v,0),ft:pct,lines:[{name:"Top-10 share",vals:ws.map(k=>S.stats[k].tot?S.stats[k].top10/S.stats[k].tot:null),color:cssVar("--accent"),area:true}]});
+  const sc=document.getElementById("cScatter"); sc._cfg={}; sc._draw=()=>scatter(sc,rows.filter(c=>c.uv>=50)); sc._draw();
+}
+function scatter(host,pts){
+  host.replaceChildren(); if(!pts.length){ host.textContent="No campaigns with 50+ visitors."; return; }
+  const W=Math.max(280,host.clientWidth||600), H=280, m={t:12,r:16,b:30,l:52};
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,height:H,role:"img","aria-label":"Campaign traffic versus revenue per visitor"},host);
+  const xs=pts.map(p=>p.uv), ys=pts.map(p=>p.d/p.uv);
+  const lx0=Math.floor(Math.log10(Math.min(...xs))), lx1=Math.ceil(Math.log10(Math.max(...xs)));
+  const ty=niceTicks(0,Math.max(...ys)*1.05,4);
+  const X=v=>m.l+(Math.log10(v)-lx0)/((lx1-lx0)||1)*(W-m.l-m.r), Y=v=>m.t+(H-m.t-m.b)-(v/ty[ty.length-1])*(H-m.t-m.b);
+  ty.forEach(t=>{ el("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"gridl"},svg); const tx=el("text",{x:m.l-8,y:Y(t)+3.5,"text-anchor":"end",class:"ax"},svg); tx.textContent="₹"+Math.round(t); });
+  for(let p=lx0;p<=lx1;p++){ const v=Math.pow(10,p); el("line",{x1:X(v),x2:X(v),y1:m.t,y2:H-m.b,class:"gridl"},svg); const tx=el("text",{x:X(v),y:H-10,"text-anchor":"middle",class:"ax"},svg); tx.textContent=intS(v); }
+  const tx=el("text",{x:W-m.r,y:H-10+0,"text-anchor":"end",class:"ax"},svg); tx.textContent="";
+  // reference: overall revenue per visitor that week
+  const r=S.rows[S.sel]; if(r.rpv<=ty[ty.length-1]){ el("line",{x1:m.l,x2:W-m.r,y1:Y(r.rpv),y2:Y(r.rpv),class:"ann-l"},svg); const t2=el("text",{x:W-m.r-2,y:Y(r.rpv)-4,"text-anchor":"end",class:"ann-t"},svg); t2.textContent="all-ads avg "+rs(r.rpv); }
+  const A=cssVar("--accent"), SF=cssVar("--surface");
+  const sorted=[...pts].sort((a,b)=>b.d-a.d);
+  sorted.slice().reverse().forEach(p=>{
+    const c=el("circle",{cx:X(p.uv),cy:Y(p.d/p.uv),r:p.d>0?5.5:4,fill:p.d>0?A:"none",stroke:p.d>0?SF:A,"stroke-width":p.d>0?1.5:1.2,opacity:p.d>0?.85:.7,tabindex:0},svg);
+    const show=ev=>showTip(ev,p.nm||("Campaign "+p.id),[{l:"Donations",v:inr(p.d)},{l:"Visitors",v:int(p.uv)},{l:"Rev / visitor",v:rs(p.d/p.uv)},{l:"Orders",v:int(p.op)}]);
+    c.addEventListener("pointermove",show); c.addEventListener("pointerleave",hideTip);
+    c.addEventListener("focus",()=>{const b=c.getBoundingClientRect(); show({clientX:b.right,clientY:b.bottom});}); c.addEventListener("blur",hideTip);
+  });
+  sorted.slice(0,3).forEach(p=>{ const t=el("text",{x:X(p.uv)+8,y:Y(p.d/p.uv)+4,class:"ax"},svg); const nm=(p.nm||("#"+p.id)); t.textContent=nm.length>28?nm.slice(0,27)+"…":nm; });
+}
+
+/* ---------- live data via Supabase connector ---------- */
+function rowsFrom(res){
+  const p=res&&res.payload; if(Array.isArray(p)) return p;
+  let t = typeof p==="string" ? p : (p&&typeof p.result==="string" ? p.result : null);
+  if(!t && res && Array.isArray(res.content)) t=res.content.filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  if(t){ try{ const j=JSON.parse(t); if(Array.isArray(j)) return j; if(j&&typeof j.result==="string") t=j.result; }catch(e){}
+    const m=t.match(/<untrusted-data-[^>]*>([\s\S]*?)<\/untrusted-data/); const body=m?m[1]:t;
+    const a=body.indexOf("["), b=body.lastIndexOf("]"); if(a>=0&&b>a) return JSON.parse(body.slice(a,b+1)); }
+  throw {code:"parse",message:"Supabase answered, but not with rows this page recognises."};
+}
+function errText(e){
+  switch(e&&e.code){
+    case "needs_reauth": return "Your Supabase connection has expired. Reconnect Supabase in claude.ai Settings → Connectors, then try again.";
+    case "server_not_connected": return "The Supabase connector isn't added for your account. Add it in claude.ai Settings → Connectors to load live data.";
+    case "selection_required": return "You have more than one Supabase connector — choose which one this page should use when prompted, then try again.";
+    case "not_in_manifest": case "consent_required": return "Supabase access is turned off for this page. Allow it when prompted to load live data.";
+    case "blocked_by_policy": case "approval_required": return "Your organisation's policy blocks this page from querying Supabase.";
+    case "server_unavailable": return "Supabase didn't respond. Try again in a moment.";
+    case "cancelled": return "Supabase took longer than 90 seconds to answer. Check for an approval prompt from Claude, then press Load live data again.";
+    case "tool_error": return "Supabase returned an error: "+(e.message||"query failed");
+    case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view — showing the saved snapshot.";
+    default: return (e&&e.message)||"Couldn't load live data.";
+  }
+}
+async function sql(q, retried){
+  try{ const sig = (typeof AbortSignal!=="undefined" && AbortSignal.timeout) ? AbortSignal.timeout(90000) : undefined;
+    return rowsFrom(await S.mcp.callTool(SERVER,TOOL,{project_id:PROJECT,query:q},{cache:false,signal:sig})); }
+  catch(e){ if(e&&e.retryable&&!retried){ await new Promise(r=>setTimeout(r,(e.retryAfterMs||1500)+Math.random()*800)); return sql(q,true);} throw e; }
+}
+const Q_SUM=`select week_start::text w, campaign_views v, uq_visitors uv, total_donation don, total_orders ord, unique_donors donors, tipped_orders tipped, tip_amount tip, contri_initiated ci, cart_created cart, order_created oc from otd_weekly_summary where category='ad' order by week_start`;
+const Q_STATS=`with c as (select week_start, campaign_id, coalesce(pageviews,0) pv, coalesce(total_donation,0) d from otd_weekly_campaigns where category='ad'), f as (select campaign_id, min(week_start) fw from c group by 1), r as (select c.*, row_number() over (partition by week_start order by d desc) rd from c) select r.week_start::text w, count(*) filter (where pv>0) n_live, count(*) filter (where d>0) n_don, count(*) filter (where f.fw=r.week_start) n_new, round(sum(d) filter (where rd<=10)) top10, round(sum(d)) tot from r join f using (campaign_id) group by 1 order by 1`;
+const qCamp=w=>`with c as (select week_start, campaign_id, coalesce(pageviews,0) pv, coalesce(uq_visitors,0) uv, coalesce(contri_initiated,0) ci, coalesce(order_placed,0) op, coalesce(total_donation,0) d from otd_weekly_campaigns where category='ad' and week_start in (date '${w}', date '${w}' - 7)), a as (select * from c where week_start=date '${w}'), b as (select * from c where week_start=date '${w}' - 7), u as (select coalesce(a.campaign_id,b.campaign_id) id, coalesce(a.pv,0) pv, coalesce(a.uv,0) uv, coalesce(a.ci,0) ci, coalesce(a.op,0) op, coalesce(a.d,0) d, coalesce(b.d,0) pd from a full join b on a.campaign_id=b.campaign_id), r as (select u.*, row_number() over (order by pv desc) rv from u), tt as (select campaign_id, sum(coalesce(total_donation,0)) tot, min(week_start) fw from otd_weekly_campaigns where category='ad' and week_start <= date '${w}' group by 1) select r.id, r.pv, r.uv, r.ci, r.op, round(r.d) d, round(r.pd) pd, round(tt.tot) tot, tt.fw::text fw, left(n.campaign_name,110) nm from r left join tt on tt.campaign_id=r.id left join lateral (select campaign_name from otd_monthly_campaigns m where m.campaign_id=r.id and m.category='ad' order by month_start desc limit 1) n on true where r.d>0 or r.pd>0 or r.rv<=25 order by r.d desc`;
+
+function setSrc(s,t){ S.live=s; const e=document.getElementById("src"); e.dataset.s=s; document.getElementById("srcT").textContent=t; }
+async function goLive(){
+  const btn=document.getElementById("live"); btn.disabled=true;
+  if(!S.mcp){ const mcp=window.claude? await window.claude.use("mcp").catch(()=>null) : null;
+    if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
+    S.mcp=mcp; }
+  setSrc("loading","Loading from Supabase… approve the prompt if one appears"); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; renderCampaigns();
+  const [sum,st]=await Promise.allSettled([sql(Q_SUM),sql(Q_STATS)]);
+  if(sum.status==="fulfilled" && sum.value.length){
+    const keepW=S.rows[S.sel]&&S.rows[S.sel].w, wasLatest=S.sel===S.rows.length-1;
+    setRows(sum.value.map(r=>{const o={w:r.w}; RAW.forEach(k=>o[k]=Number(r[k])||0); return o;}));
+    const i=S.rows.findIndex(r=>r.w===keepW); S.sel = wasLatest||i<0 ? S.rows.length-1 : i;
+    const t=new Date(); setSrc("live",`Live · Supabase · ${t.getHours().toString().padStart(2,"0")}:${t.getMinutes().toString().padStart(2,"0")}`);
+    btn.textContent="Refresh";
+  } else { setSrc("error","Snapshot · "+(sum.status==="rejected"?"live load failed":"no rows returned")); if(sum.status==="rejected") S.statsErr=errText(sum.reason); }
+  if(st.status==="fulfilled"){ S.stats={}; st.value.forEach(r=>{ S.stats[r.w]={n_live:+r.n_live,n_don:+r.n_don,n_new:+r.n_new,top10:+r.top10,tot:+r.tot}; }); }
+  else S.statsErr = errText(st.reason);
+  btn.disabled=false; fillWeeks(); renderAll(); loadCohorts();
+}
+async function loadCamp(w){
+  if(S.campLoading[w]) return; S.campLoading[w]=true;
+  try{ const rows=await sql(qCamp(w)); S.camp[w]=rows.map(r=>({id:String(r.id),pv:+r.pv,uv:+r.uv,ci:+r.ci,op:+r.op,d:+r.d,pd:+r.pd,tot:r.tot==null?null:+r.tot,fw:r.fw||null,nm:r.nm||""})); }
+  catch(e){ S.campErr[w]=errText(e); }
+  S.campLoading[w]=false; if(S.rows[S.sel].w===w) renderCampaigns();
+}
+
+/* ---------- launch-month cohorts ---------- */
+const Q_COH_ROWS=`select week_start::text w, campaign_id id, round(total_donation) d, coalesce(order_placed,0) op from otd_weekly_campaigns where category='ad' and total_donation>0 order by 1`;
+const Q_COH_CAMPS=`with f as (select campaign_id, min(week_start) fw from otd_weekly_campaigns where category='ad' group by 1) select f.campaign_id id, f.fw::text fw, left(n.campaign_name,110) nm from f left join lateral (select campaign_name from otd_monthly_campaigns m where m.campaign_id=f.campaign_id and m.category='ad' order by month_start desc limit 1) n on true where exists (select 1 from otd_weekly_campaigns x where x.campaign_id=f.campaign_id and x.category='ad' and x.total_donation>0)`;
+const Q_COH_SEEN=`select fw::text fw, count(*) n from (select campaign_id, min(week_start) fw from otd_weekly_campaigns where category='ad' group by 1) f group by 1 order by 1`;
+const COH_COLORS=["--accent","--s2","--s3","--s4","--s5","--s6"];
+const MONL=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const addDays=(w,n)=>{ const d=dt(w); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const wkDiff=(a,b)=>Math.round((dt(a)-dt(b))/6048e5);
+function cohMsg(h){ document.getElementById("cohBody").innerHTML=h; }
+
+function cohModel(selW){
+  const C=S.coh, first=C.seen[0].fw;
+  const key=fw=> fw===first ? "pre" : fw.slice(0,7);
+  const months=[...new Set(C.seen.map(s=>key(s.fw)).filter(k=>k!=="pre"))].sort();
+  const color=k=> k==="pre" ? cssVar("--muted") : cssVar(COH_COLORS[months.indexOf(k)%COH_COLORS.length]);
+  const label=k=>{ if(k==="pre") return `Live before ${wl(first)}`; const [y,m]=k.split("-"); return `${MONL[+m-1]} ${y.slice(2)} launches`; };
+  const cohs={};
+  C.seen.forEach(s=>{ if(s.fw>selW) return; const k=key(s.fw); (cohs[k]=cohs[k]||{k,seen:0,lastFw:s.fw,camps:{}}); cohs[k].seen+=s.n; if(s.fw>cohs[k].lastFw) cohs[k].lastFw=s.fw; });
+  const campMeta={}; C.camps.forEach(c=>{ campMeta[c.id]=c; });
+  C.rows.forEach(r=>{ if(r.w>selW) return; const m=campMeta[r.id]; if(!m||m.fw>selW) return; const k=key(m.fw); const co=cohs[k]; if(!co) return;
+    const c=co.camps[r.id]||(co.camps[r.id]={id:r.id,nm:m.nm,fw:m.fw,tot:0,wk:0,f4:0,best:0,bestW:null,now:0,weeks:{}});
+    c.tot+=r.d; c.wk+=1; c.weeks[r.w]=r.d; if(r.d>c.best){c.best=r.d;c.bestW=r.w;} if(wkDiff(r.w,m.fw)<=3) c.f4+=r.d; if(r.w===selW) c.now=r.d; });
+  const order=["pre",...months].filter(k=>cohs[k]);
+  const weekTot=C.rows.filter(r=>r.w===selW).reduce((a,r)=>a+r.d,0);
+  order.forEach(k=>{ const co=cohs[k]; const list=Object.values(co.camps).sort((a,b)=>b.tot-a.tot);
+    co.list=list; co.don=list.length; co.tot=list.reduce((a,c)=>a+c.tot,0); co.now=list.reduce((a,c)=>a+c.now,0);
+    const full=list.filter(c=>wkDiff(selW,c.fw)>=3); co.f4n=full.length; co.f4=full.length?full.reduce((a,c)=>a+c.f4,0)/full.length:null;
+    co.color=color(k); co.label=label(k); co.partial = k!=="pre" && k===selW.slice(0,7); });
+  return {first,order,cohs,weekTot,key,color,label};
+}
+
+function renderCohorts(){
+  const selW=S.rows[S.sel].w;
+  if(!S.mcp){ cohMsg(`<div class="notice"><p>Launch-month cohorts group campaigns by the month they first appeared in <code>otd_weekly_campaigns</code>. They load from Supabase with the rest of the live data.</p><button type="button" class="btn primary" data-act="live">Load live data</button></div>`); return; }
+  if(S.cohErr){ cohMsg(`<div class="notice"><p>${esc(S.cohErr)}</p><button type="button" class="btn" data-act="live">Try again</button></div>`); return; }
+  if(!S.coh){ cohMsg(`<div class="notice"><p>Loading launch-month cohorts…</p></div>`); return; }
+  if(!S.coh.seen.length){ cohMsg(`<div class="notice"><p>No campaign rows in Supabase yet.</p></div>`); return; }
+  const first=S.coh.seen[0].fw;
+  if(selW<first){ cohMsg(`<div class="notice"><p>Campaign-level data starts the week of ${wlY(first)}, so there are no cohorts for the week of ${wlY(selW)}.</p></div>`); return; }
+  const Mo=cohModel(selW), {order,cohs}=Mo;
+  if(!S.cohSel || !cohs[S.cohSel]) S.cohSel = [...order].reverse().find(k=>cohs[k].don>0) || order[0];
+  const pre=cohs.pre;
+  const rowsH=order.map(k=>{ const c=cohs[k]; const top=c.list[0];
+    return `<tr class="${k===S.cohSel?"cur":""} ckrow" data-coh="${k}" tabindex="0" style="cursor:pointer">
+      <td><span style="display:inline-flex;align-items:center;gap:8px"><i style="width:10px;height:10px;border-radius:2px;background:${c.color};display:inline-block"></i>${esc(c.label)}${c.partial?' <span class="pill">month in progress</span>':""}${k==="pre"?' <span class="pill">*</span>':""}</span></td>
+      <td>${int(c.seen)}</td><td>${int(c.don)} <span style="color:var(--muted)">(${pct(c.seen?c.don/c.seen:0,0)})</span></td>
+      <td>${inr(c.tot)}</td><td>${c.don?inr(c.tot/c.don):"–"}</td>
+      <td>${k==="pre"?'<span style="color:var(--muted)">start unknown</span>':(c.f4==null?'<span style="color:var(--muted)">none 4 wks old yet</span>':inr(c.f4)+` <span style="color:var(--muted)">(${c.f4n})</span>`)}</td>
+      <td>${inr(c.now)}</td><td>${Mo.weekTot?pct(c.now/Mo.weekTot,0):"–"}</td>
+      <td class="nm">${top?esc(top.nm||"Campaign "+top.id)+`<small>#${esc(top.id)} · ${inr(top.tot)}</small>`:"–"}</td></tr>`; }).join("");
+  const sc=cohs[S.cohSel];
+  const listH=sc.list.map(c=>`<tr><td class="nm">${esc(c.nm||"Campaign "+c.id)}<small>#${esc(c.id)}${c.nm?"":" · name not in Supabase"}</small></td><td>${wl(c.fw)}</td><td>${wkDiff(selW,c.fw)+1}</td><td>${c.wk}</td><td>${S.cohSel==="pre"?"–":(wkDiff(selW,c.fw)>=3?inr(c.f4):'<span style="color:var(--muted)">'+inr(c.f4)+" so far</span>")}</td><td>${inr(c.tot)}</td><td>${c.now?inr(c.now):"–"}</td><td>${inr(c.best)} <span style="color:var(--muted)">${wl(c.bestW)}</span></td></tr>`).join("");
+  cohMsg(`
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="tw" style="border:0;border-radius:0;box-shadow:none"><table>
+        <thead><tr><th>Launch month</th><th>Campaigns launched</th><th>Got donations</th><th>Donations to date</th><th>Per donating campaign</th><th>Avg first 4 weeks</th><th>This week</th><th>Share of week</th><th>Top campaign</th></tr></thead>
+        <tbody>${rowsH}</tbody></table></div>
+      <p class="tnote" style="padding:8px 16px 12px;margin:0;border-top:1px solid var(--line)">Launch month = month of the first week a campaign appears in <code>otd_weekly_campaigns</code>. Totals run up to the week of ${wlY(selW)}. "Avg first 4 weeks" = donations in a campaign's first 4 weeks, averaged over donating campaigns that are at least 4 weeks old (count in brackets).${pre?` <span class="pill">*</span> Data starts ${wlY(first)}, so campaigns already running that week have an unknown launch date and their earlier donations aren't in Supabase — they're kept apart instead of being counted as ${MONL[dt(first).getMonth()]} launches.`:""} Click a row to list its campaigns.</p>
+    </div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card"><h3>Where each week's donations come from</h3><p class="sub">Weekly ad-campaign donations, split by launch month</p>
+        <div class="legend">${order.map(k=>`<span><i style="background:${cohs[k].color};height:8px;width:10px"></i>${esc(cohs[k].label)}</span>`).join("")}</div>
+        <div class="chart" id="cCohStack"></div></div>
+      <div class="card"><h3>How fast each month's launches raise money</h3><p class="sub">Cumulative donations by weeks since launch. Each line stops at the age its latest launches have reached.</p>
+        <div class="legend">${order.filter(k=>k!=="pre").map(k=>`<span><i style="background:${cohs[k].color}"></i>${esc(cohs[k].label)}</span>`).join("")}</div>
+        <div class="chart" id="cCohAge"></div></div>
+    </div>
+    <div class="card" style="margin-top:12px;padding:0;overflow:hidden">
+      <div style="padding:14px 16px 8px"><h3><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${sc.color};margin-right:8px"></span>${esc(sc.label)}: campaigns with donations</h3><p class="sub" style="margin:0">${int(sc.don)} of ${int(sc.seen)} campaigns launched got donations · ranked by donations to date</p></div>
+      <div class="tscroll" style="max-height:420px"><table>
+        <thead><tr><th>Campaign</th><th>Launched</th><th>Weeks live</th><th>Weeks with donations</th><th>First 4 weeks</th><th>Donations to date</th><th>This week</th><th>Best week</th></tr></thead>
+        <tbody>${listH||'<tr><td colspan="8" style="text-align:left;color:var(--muted)">No campaign in this cohort has received donations yet.</td></tr>'}</tbody></table></div>
+    </div>`);
+  // stacked weekly bars
+  const weeks=S.rows.map(r=>r.w).filter(w=>w>=first && w<=selW);
+  const meta={}; S.coh.camps.forEach(c=>meta[c.id]=c);
+  const series=order.map(k=>({name:cohs[k].label,color:cohs[k].color,vals:weeks.map(()=>0)}));
+  S.coh.rows.forEach(r=>{ const i=weeks.indexOf(r.w); if(i<0) return; const m=meta[r.id]; if(!m) return; const j=order.indexOf(Mo.key(m.fw)); if(j<0) return; series[j].vals[i]+=r.d; });
+  stackBars(document.getElementById("cCohStack"),{x:weeks,sel:weeks.length-1,h:250,fy:inrS,ft:inr,series});
+  // cumulative by age
+  const lines=order.filter(k=>k!=="pre").map(k=>{ const co=cohs[k]; const maxAge=wkDiff(selW,co.lastFw); const vals=[]; let cum=0;
+    for(let a=0;a<=Math.max(0,maxAge);a++){ Object.values(co.camps).forEach(c=>{ const w=addDays(c.fw,7*a); if(c.weeks[w]) cum+=c.weeks[w]; }); vals.push(cum); }
+    return {name:co.label,color:co.color,vals}; });
+  const maxLen=Math.max(1,...lines.map(l=>l.vals.length));
+  lines.forEach(l=>{ while(l.vals.length<maxLen) l.vals.push(null); });
+  const ages=[...Array(maxLen).keys()].map(String);
+  tsChart(document.getElementById("cCohAge"),{x:ages,h:250,zero:true,fy:inrS,ft:inr,xf:a=>"wk "+(+a+1),tt:a=>`Week ${+a+1} since launch`,lines});
+}
+
+function stackBars(host,cfg){
+  host._cfg=cfg; host._draw=()=>stackBars(host,cfg); host.replaceChildren();
+  const W=Math.max(260,host.clientWidth||600),H=cfg.h||220,m={t:10,r:12,b:22,l:52};
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,height:H,role:"img","aria-label":"Stacked weekly donations by launch month"},host);
+  const n=cfg.x.length; if(!n) return; const iw=W-m.l-m.r, ih=H-m.t-m.b, band=iw/n, xc=i=>m.l+band*(i+.5);
+  const totals=cfg.x.map((_,i)=>cfg.series.reduce((a,s)=>a+s.vals[i],0));
+  const ticks=niceTicks(0,Math.max(...totals,1),4), top=ticks[ticks.length-1], y=v=>m.t+ih-v/top*ih;
+  ticks.forEach(t=>{ el("line",{x1:m.l,x2:W-m.r,y1:y(t),y2:y(t),class:"gridl"},svg); const tx=el("text",{x:m.l-8,y:y(t)+3.5,"text-anchor":"end",class:"ax"},svg); tx.textContent=cfg.fy(t); });
+  const every=Math.max(1,Math.ceil(n/(W<420?4:7)));
+  for(let i=n-1;i>=0;i-=every){ const tx=el("text",{x:xc(i),y:H-6,"text-anchor":"middle",class:"ax"},svg); tx.textContent=(cfg.xf||wl)(cfg.x[i]); }
+  const bw=Math.max(3,Math.min(26,band-3)), SF=cssVar("--surface");
+  cfg.x.forEach((w,i)=>{ let acc=0; const g=el("g",{},svg);
+    cfg.series.forEach(s=>{ const v=s.vals[i]; if(!v) return; const y0=y(acc), y1=y(acc+v); acc+=v;
+      el("rect",{x:xc(i)-bw/2,y:y1,width:bw,height:Math.max(0,y0-y1),fill:s.color,stroke:SF,"stroke-width":1},g); });
+    const hit=el("rect",{x:xc(i)-band/2,y:m.t,width:band,height:ih,fill:"transparent"},svg);
+    hit.addEventListener("pointermove",ev=>showTip(ev,"Week of "+wlY(w),cfg.series.filter(s=>s.vals[i]).map(s=>({l:s.name,v:cfg.ft(s.vals[i]),c:s.color})).concat([{l:"Total",v:cfg.ft(totals[i])}])));
+    hit.addEventListener("pointerleave",hideTip); });
+  el("line",{x1:m.l,x2:W-m.r,y1:m.t+ih,y2:m.t+ih,class:"base-l"},svg);
+}
+async function loadCohorts(){
+  S.coh=null; S.cohErr=null;
+  try{ const [rows,camps,seen]=await Promise.all([sql(Q_COH_ROWS),sql(Q_COH_CAMPS),sql(Q_COH_SEEN)]);
+    S.coh={rows:rows.map(r=>({w:r.w,id:String(r.id),d:+r.d,op:+r.op})), camps:camps.map(c=>({id:String(c.id),fw:c.fw,nm:c.nm||""})), seen:seen.map(s=>({fw:s.fw,n:+s.n})).sort((a,b)=>a.fw<b.fw?-1:1)}; }
+  catch(e){ S.cohErr=errText(e); }
+  renderCohorts();
+}
+
+/* ---------- controls ---------- */
+function fillWeeks(){
+  const s=document.getElementById("wk");
+  s.innerHTML=S.rows.map((r,i)=>`<option value="${i}">${wlY(r.w)}${i===S.rows.length-1?" (latest)":""}</option>`).reverse().join("");
+  s.value=S.sel;
+}
+function renderAll(){ renderBrief(); renderKPIs(); renderCharts(); renderFunnel(); renderTable(); renderCampaigns(); renderCohorts(); }
+document.getElementById("wk").addEventListener("change",e=>{ S.sel=+e.target.value; renderAll(); });
+[["cmp","cmp",v=>v],["rng","rng",v=>+v]].forEach(([id,key,cv])=>{
+  document.getElementById(id).addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+    S[key]=cv(b.dataset.v); document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderAll(); });
+});
+document.getElementById("live").addEventListener("click",goLive);
+const cohBody=document.getElementById("cohBody");
+const pickCoh=e=>{ const b=e.target.closest("[data-act]"); if(b&&b.dataset.act==="live"){ goLive(); return; } const r=e.target.closest(".ckrow"); if(r){ S.cohSel=r.dataset.coh; renderCohorts(); } };
+cohBody.addEventListener("click",pickCoh);
+cohBody.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.closest(".ckrow")){ e.preventDefault(); pickCoh(e); } });
+document.getElementById("campBody").addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return;
+  const a=b.dataset.act; if(a==="live") goLive();
+  else if(a==="goto"){ const i=S.rows.findIndex(r=>r.w===b.dataset.w); if(i>=0){ S.sel=i; document.getElementById("wk").value=i; renderAll(); } }
+  else if(a==="retry"){ const w=S.rows[S.sel].w; delete S.campErr[w]; renderCampaigns(); } });
+const mq=matchMedia("(prefers-color-scheme: dark)"); const rerender=()=>renderAll();
+mq.addEventListener&&mq.addEventListener("change",rerender);
+new MutationObserver(rerender).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+fillWeeks(); setSrc("snap",`Snapshot · through ${wlY(S.rows[S.rows.length-1].w)}`); renderAll(); redrawOnResize();
+
+/* auto-load live data when this viewer already allowed Supabase for the page */
+(async()=>{ try{ if(!window.claude) return; const p=await window.claude.use("permissions"); if(!p) return;
+  const st=await p.state("mcp:"+SERVER).catch(()=>"unavailable"); if(st==="granted") goLive(); }catch(e){} })();
+</script>
+
+</body>
+</html>
