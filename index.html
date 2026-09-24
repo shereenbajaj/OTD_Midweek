@@ -66,6 +66,7 @@ select{background:var(--surface);border:1px solid var(--line);border-radius:8px;
 .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600}
 .btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:progress}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .src{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
@@ -214,6 +215,7 @@ td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--m
           </div>
         </div>
         <span class="src" id="src" data-s="snap"><span class="dot"></span><span id="srcT">Snapshot</span></span>
+        <button type="button" class="btn" id="refresh" title="Fetch the latest numbers from Supabase">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -670,14 +672,14 @@ const qCamp=w=>`with c as (select week_start, campaign_id, coalesce(pageviews,0)
 
 function setSrc(s,t){ S.live=s; const e=document.getElementById("src"); e.dataset.s=s; document.getElementById("srcT").textContent=t; }
 async function goLive(){
-  const btn={disabled:false,textContent:""};
+  const btn=document.getElementById("refresh"); if(btn.disabled) return; btn.disabled=true;
   if(IN_CLAUDE){
     if(!S.mcp){ const mcp=await window.claude.use("mcp").catch(()=>null);
       if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
       S.mcp=mcp; }
   } else {
     const sb=await getSB();
-    if(!sb){ setSrc("error","Snapshot · couldn't reach Supabase"); return; }
+    if(!sb){ setSrc("error","Snapshot · couldn't reach Supabase"); btn.disabled=false; return; }
   }
   S.liveOn=true;
   setSrc("loading", IN_CLAUDE ? "Loading from Supabase… approve the prompt if one appears" : "Loading from Supabase…"); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; renderCampaigns();
@@ -847,6 +849,7 @@ async function fetchCohorts(){
 
 
 /* ---------- controls ---------- */
+document.getElementById("refresh").addEventListener("click",()=>goLive());
 function fillWeeks(){
   const s=document.getElementById("wk");
   s.innerHTML=S.rows.map((r,i)=>`<option value="${i}">${wlY(r.w)}${i===S.rows.length-1?" (latest)":""}</option>`).reverse().join("");

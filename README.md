@@ -7,7 +7,7 @@ Weekly review dashboard for Ketto OTD (one-time donation) **ad campaigns**.
 - `dashboard.template.html` — same page with `__SNAP__` in place of the embedded snapshot data.
 
 ## Data
-- The page loads the latest data from Supabase automatically every time it opens — no sign-in, no button.
+- The page loads the latest data from Supabase automatically every time it opens (no sign-in). The **↻ Refresh** button next to the status chip fetches it again without reloading.
 - It calls read-only database functions with the project's publishable key:
   - `otd_dash_weekly_summary()` → `otd_weekly_summary` (category = `ad`)
   - `otd_dash_campaign_stats()`, `otd_dash_campaign_week(w)`, `otd_dash_cohorts()` → `otd_weekly_campaigns` (category = `ad`), names from `otd_monthly_campaigns`
