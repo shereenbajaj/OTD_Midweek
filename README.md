@@ -1,32 +1,21 @@
 # OTD Midweek — Ad Campaigns Weekly Review
 
-Weekly review dashboard for Ketto OTD (one-time donation) **ad campaigns**. MetaGo staff only.
+Weekly review dashboard for Ketto OTD (one-time donation) **ad campaigns**.
 
 ## Files
 - `index.html` — the dashboard, a single self-contained page.
-- `dashboard.template.html` — the same page without the `<html>`/`<head>`/`<body>` wrapper.
-- `supabase/functions/otd-dash/` — the Edge Function that checks the sign-in and returns the data.
-- `supabase/migrations/` — closes the `otd_dash_*` database functions to everyone except that Edge Function.
+- `dashboard.template.html` — same page with `__SNAP__` in place of the embedded snapshot data.
 
-## Sign-in and data
-1. The page shows a **Sign in with MetaGo** screen. Sign-in goes through MetaGo Central Auth (`auth.metago.health`, Google login), using the OAuth authorization-code + PKCE flow. The sign-in lasts for the browser tab.
-2. With the resulting access token, the page calls the `otd-dash` Edge Function. It checks the token against `https://auth.metago.health/.well-known/jwks.json` (RS256, issuer, audience = this dashboard's client id, expiry, `typ = access`) and the email domain (default `metago.health`), then runs one of:
-   - `otd_dash_weekly_summary()` → `otd_weekly_summary` (category = `ad`)
-   - `otd_dash_campaign_stats()`, `otd_dash_campaign_week(w date)`, `otd_dash_cohorts()` → `otd_weekly_campaigns` (category = `ad`), names from `otd_monthly_campaigns`
-3. The page has no built-in data. Nothing loads until someone signs in, and the raw tables and `otd_dash_*` functions can't be read from the browser.
-4. Inside Claude, the page skips the MetaGo sign-in and reads Supabase through the viewer's own Supabase connector.
+## Data
+- The page loads the latest data from Supabase automatically every time it opens (no sign-in). The **↻ Refresh** button next to the status chip fetches it again without reloading.
+- It calls read-only database functions with the project's publishable key:
+  - `otd_dash_weekly_summary()` → `otd_weekly_summary` (category = `ad`)
+  - `otd_dash_campaign_stats()`, `otd_dash_campaign_week(w)`, `otd_dash_cohorts()` → `otd_weekly_campaigns` (category = `ad`), names from `otd_monthly_campaigns`
+- The raw tables stay closed (RLS); only these functions' outputs are readable. Anyone with the page link can see the dashboard numbers.
+- If Supabase can't be reached, the page falls back to the embedded snapshot (3 Nov 2025 – 14 Sep 2026).
 
-## Setup
-1. **Register the dashboard at auth.metago.health** (auth team): a public OAuth client with PKCE, and the page's address as an allowed redirect URI (e.g. `https://shereenbajaj.github.io/OTD_Midweek/`). The CORS settings for `/oauth/token` must allow that origin.
-2. **Set the client id** in `index.html`: `AUTH.clientId` (and `AUTH.scope` if the auth service needs one). Rebuild `dashboard.template.html` to match.
-3. **Deploy the Edge Function** (Supabase CLI, project `njgctrmitailbvjtyeiz`):
-   ```sh
-   supabase secrets set METAGO_AUDIENCE=<client id> ALLOWED_ORIGINS=https://shereenbajaj.github.io --project-ref njgctrmitailbvjtyeiz
-   supabase functions deploy otd-dash --no-verify-jwt --project-ref njgctrmitailbvjtyeiz
-   ```
-   Optional secrets: `ALLOWED_EMAIL_DOMAINS` (default `metago.health`, comma-separated, `*` = anyone signed in), `ALLOWED_ROLES`, `METAGO_ISSUER`.
-4. **Lock the database functions**: run `supabase/migrations/20260928000000_otd_dash_service_role_only.sql` (SQL editor, or `supabase db push`). Do this after step 3.
-5. **Host the page**: GitHub → Settings → Pages → deploy from `main` / root.
+## Hosting
+GitHub → Settings → Pages → deploy from `main` / root.
 
 ## Definitions
 - Orders = orders placed. Donations exclude tips. Order conversion = orders placed ÷ unique visitors.

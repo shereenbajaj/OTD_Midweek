@@ -188,12 +188,6 @@ td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--m
 .foot{margin-top:32px;font-size:12px;color:var(--muted);display:grid;gap:4px}
 .foot b{color:var(--ink-2);font-weight:600}
 @media (prefers-reduced-motion:no-preference){.fb,.mv .b{transition:width .35s ease}}
-/* sign-in gate: until data loads, only the header and the gate show */
-body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(#user){display:none}
-.gate{margin-top:28px}
-.gate h2{margin:0 0 4px}
-.src[hidden]{display:none}
-.linkbtn{border:0;background:none;color:var(--accent-ink);cursor:pointer;font-size:12px;font-weight:600;padding:0 0 0 6px}
 </style>
 
 </head>
@@ -220,19 +214,11 @@ body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(
             <button type="button" data-v="0" aria-pressed="false">All</button>
           </div>
         </div>
-        <span class="src" id="src" data-s="loading"><span class="dot"></span><span id="srcT">Loading…</span></span>
+        <span class="src" id="src" data-s="snap"><span class="dot"></span><span id="srcT">Snapshot</span></span>
         <button type="button" class="btn" id="refresh" title="Fetch the latest numbers from Supabase">↻ Refresh</button>
-        <span class="src" id="user" hidden><span id="userEmail"></span><button type="button" class="linkbtn" id="signout">Sign out</button></span>
       </div>
     </div>
   </header>
-
-  <div class="gate" id="gate" hidden>
-    <div class="notice">
-      <div><h2 id="gateT"></h2><p id="gateMsg"></p></div>
-      <div><button type="button" class="btn primary" id="signin">Sign in with MetaGo</button> <button type="button" class="btn" id="gateRetry">Try again</button></div>
-    </div>
-  </div>
 
   <div class="summary"><div class="brief" id="brief"></div></div>
 
@@ -312,6 +298,7 @@ body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(
 <div id="tip" hidden></div>
 
 <script>
+const SNAP = [{"w":"2025-11-03","v":304807,"uv":186803,"don":6367183,"ord":5250,"donors":4972,"tipped":3813,"tip":347751,"ci":29051,"cart":17400,"oc":7603},{"w":"2025-11-10","v":284349,"uv":189717,"don":5871694,"ord":4715,"donors":4486,"tipped":3379,"tip":331778,"ci":30378,"cart":19469,"oc":6808},{"w":"2025-11-17","v":233620,"uv":142404,"don":4776636,"ord":3362,"donors":3173,"tipped":2362,"tip":269302,"ci":26673,"cart":15642,"oc":4959},{"w":"2025-11-24","v":255447,"uv":156706,"don":6320259,"ord":4413,"donors":4151,"tipped":3193,"tip":341129,"ci":29220,"cart":17220,"oc":6530},{"w":"2025-12-01","v":420603,"uv":234822,"don":8766764,"ord":7137,"donors":6725,"tipped":5338,"tip":513981,"ci":41115,"cart":19774,"oc":10615},{"w":"2025-12-08","v":255975,"uv":133346,"don":6870998,"ord":5376,"donors":5004,"tipped":3850,"tip":386217,"ci":28465,"cart":18489,"oc":7647},{"w":"2025-12-15","v":198612,"uv":100221,"don":5165742,"ord":3919,"donors":3672,"tipped":2866,"tip":290409,"ci":21881,"cart":14819,"oc":5538},{"w":"2025-12-22","v":231331,"uv":123040,"don":8758126,"ord":6222,"donors":5913,"tipped":4700,"tip":542461,"ci":28726,"cart":17474,"oc":8723},{"w":"2025-12-29","v":232615,"uv":122866,"don":6579343,"ord":4900,"donors":4596,"tipped":3583,"tip":397612,"ci":23091,"cart":13996,"oc":6947},{"w":"2026-01-05","v":274919,"uv":151312,"don":14109579,"ord":8378,"donors":7813,"tipped":6290,"tip":822259,"ci":34634,"cart":21397,"oc":12028},{"w":"2026-01-12","v":205814,"uv":113118,"don":8143508,"ord":5547,"donors":5268,"tipped":4100,"tip":486626,"ci":26666,"cart":16825,"oc":7964},{"w":"2026-01-19","v":190054,"uv":108492,"don":8193283,"ord":5036,"donors":4805,"tipped":3642,"tip":455778,"ci":24137,"cart":15341,"oc":7049},{"w":"2026-01-26","v":326782,"uv":143861,"don":9067844,"ord":6370,"donors":6045,"tipped":4476,"tip":509361,"ci":27368,"cart":17191,"oc":8963},{"w":"2026-02-02","v":322896,"uv":145977,"don":7720634,"ord":5377,"donors":5073,"tipped":3842,"tip":420959,"ci":23459,"cart":13446,"oc":7525},{"w":"2026-02-09","v":238085,"uv":119209,"don":10207494,"ord":6067,"donors":5787,"tipped":4406,"tip":600039,"ci":24510,"cart":14631,"oc":8491},{"w":"2026-02-16","v":224551,"uv":119382,"don":12434174,"ord":5501,"donors":5281,"tipped":3833,"tip":651155,"ci":21661,"cart":12442,"oc":7499},{"w":"2026-02-23","v":272825,"uv":146726,"don":12093240,"ord":7783,"donors":7442,"tipped":5639,"tip":645725,"ci":25292,"cart":13352,"oc":10600},{"w":"2026-03-02","v":421668,"uv":217679,"don":13368877,"ord":9453,"donors":8957,"tipped":7189,"tip":796325,"ci":34529,"cart":15860,"oc":13406},{"w":"2026-03-09","v":368912,"uv":197350,"don":13089884,"ord":9405,"donors":8783,"tipped":7411,"tip":834799,"ci":41175,"cart":17225,"oc":13944},{"w":"2026-03-16","v":228573,"uv":115824,"don":8335161,"ord":4945,"donors":4597,"tipped":3623,"tip":415871,"ci":18148,"cart":8708,"oc":6734},{"w":"2026-03-23","v":199227,"uv":100661,"don":7163000,"ord":4983,"donors":4742,"tipped":3519,"tip":397579,"ci":16604,"cart":8750,"oc":6781},{"w":"2026-03-30","v":174583,"uv":96964,"don":6523673,"ord":4099,"donors":3782,"tipped":2891,"tip":343983,"ci":14067,"cart":6982,"oc":5346},{"w":"2026-04-06","v":241761,"uv":149885,"don":12442213,"ord":7803,"donors":7464,"tipped":5900,"tip":771920,"ci":24076,"cart":12718,"oc":10698},{"w":"2026-04-13","v":236900,"uv":141611,"don":8647136,"ord":6285,"donors":5980,"tipped":4681,"tip":512098,"ci":21916,"cart":10381,"oc":8665},{"w":"2026-04-20","v":318654,"uv":170760,"don":7790050,"ord":4611,"donors":4267,"tipped":3270,"tip":419763,"ci":18377,"cart":7474,"oc":6220},{"w":"2026-04-27","v":301542,"uv":173398,"don":9337271,"ord":7231,"donors":6911,"tipped":5560,"tip":605119,"ci":26845,"cart":11837,"oc":10103},{"w":"2026-05-04","v":308168,"uv":191434,"don":10333218,"ord":8983,"donors":8496,"tipped":7026,"tip":693505,"ci":38722,"cart":14914,"oc":12576},{"w":"2026-05-11","v":229978,"uv":136793,"don":7918750,"ord":5593,"donors":5325,"tipped":4231,"tip":492762,"ci":21019,"cart":9776,"oc":7742},{"w":"2026-05-18","v":222181,"uv":131189,"don":9750074,"ord":6185,"donors":5770,"tipped":4579,"tip":567747,"ci":20197,"cart":10076,"oc":8571},{"w":"2026-05-25","v":261803,"uv":170845,"don":8226845,"ord":5215,"donors":4857,"tipped":3682,"tip":441114,"ci":25550,"cart":8669,"oc":7039},{"w":"2026-06-01","v":1132393,"uv":584253,"don":27286012,"ord":20898,"donors":20270,"tipped":16230,"tip":1751282,"ci":87886,"cart":31919,"oc":29348},{"w":"2026-06-08","v":439564,"uv":320462,"don":8674291,"ord":7102,"donors":6787,"tipped":5463,"tip":570315,"ci":50343,"cart":11928,"oc":10346},{"w":"2026-06-15","v":435192,"uv":342727,"don":9391692,"ord":7523,"donors":7213,"tipped":5806,"tip":613436,"ci":71848,"cart":12980,"oc":10984},{"w":"2026-06-22","v":281956,"uv":213332,"don":7000926,"ord":5707,"donors":5420,"tipped":4263,"tip":453031,"ci":40459,"cart":9891,"oc":8054},{"w":"2026-06-29","v":284358,"uv":196089,"don":13331094,"ord":10222,"donors":9780,"tipped":7705,"tip":832892,"ci":34563,"cart":16074,"oc":14352},{"w":"2026-07-06","v":250321,"uv":179579,"don":9071854,"ord":6975,"donors":6573,"tipped":5026,"tip":537592,"ci":25046,"cart":11614,"oc":9544},{"w":"2026-07-13","v":254791,"uv":178503,"don":10985438,"ord":8991,"donors":8636,"tipped":6601,"tip":662949,"ci":29281,"cart":14114,"oc":12425},{"w":"2026-07-20","v":159604,"uv":112690,"don":6539100,"ord":4887,"donors":4588,"tipped":3509,"tip":387944,"ci":16179,"cart":8450,"oc":6729},{"w":"2026-07-27","v":220857,"uv":162294,"don":10280924,"ord":7903,"donors":7508,"tipped":6017,"tip":636228,"ci":25523,"cart":13206,"oc":10942},{"w":"2026-08-03","v":217693,"uv":159012,"don":9275510,"ord":6784,"donors":6419,"tipped":5078,"tip":565222,"ci":25119,"cart":11321,"oc":9411},{"w":"2026-08-10","v":214850,"uv":162190,"don":6778246,"ord":6005,"donors":5663,"tipped":4618,"tip":480872,"ci":25131,"cart":10442,"oc":8730},{"w":"2026-08-17","v":160376,"uv":115197,"don":9270975,"ord":7067,"donors":6754,"tipped":5389,"tip":590034,"ci":24032,"cart":11925,"oc":9882},{"w":"2026-08-24","v":110819,"uv":78774,"don":6921089,"ord":4942,"donors":4652,"tipped":3715,"tip":442755,"ci":16030,"cart":8718,"oc":6949},{"w":"2026-08-31","v":100813,"uv":67545,"don":8109384,"ord":6014,"donors":5590,"tipped":4339,"tip":471882,"ci":16720,"cart":10338,"oc":7860},{"w":"2026-09-07","v":124149,"uv":87734,"don":7251815,"ord":6068,"donors":5773,"tipped":4564,"tip":463145,"ci":18090,"cart":10401,"oc":8256},{"w":"2026-09-14","v":116234,"uv":85040,"don":6055801,"ord":4484,"donors":4262,"tipped":3358,"tip":384350,"ci":15137,"cart":8273,"oc":6172}];
 const PROJECT = "njgctrmitailbvjtyeiz";
 const SERVER = "Supabase", TOOL = "execute_sql";
 const ANN = [{w:"2026-02-23", t:"cart tracking change?"}];
@@ -356,8 +343,10 @@ const M = {
 };
 
 /* ---------- state ---------- */
-const S = { rows:[], sel:0, cmp:"wow", rng:26, live:"loading", mcp:null, stats:null, statsErr:null, camp:{}, campErr:{}, campLoading:{} };
+const S = { rows:[], sel:0, cmp:"wow", rng:26, live:"snap", mcp:null, stats:null, statsErr:null, camp:{}, campErr:{}, campLoading:{} };
 function setRows(list){ S.rows = list.map(r=>derive(Object.assign({},r))).sort((a,b)=>a.w<b.w?-1:1); }
+setRows(SNAP);
+S.sel = S.rows.length-1;
 
 function baseline(i){
   if(S.cmp==="wow"){ return i>0 ? S.rows[i-1] : null; }
@@ -660,10 +649,6 @@ function rowsFrom(res){
 function errText(e){
   if(e && e.code==="42501") return "Supabase refused access to the dashboard data.";
   switch(e&&e.code){
-    case "login_required": return "Your sign-in has expired. Sign in again to load the dashboard.";
-    case "login_failed": return "Sign-in didn't complete: "+(e.message||"please try again.");
-    case "not_allowed": return (e.message||"This account doesn't have access to this dashboard.")+" Ask the dashboard owner for access.";
-    case "misconfigured": return "The dashboard's data service isn't set up yet ("+(e.message||"missing settings")+").";
     case "needs_reauth": return "Your Supabase connection has expired. Reconnect Supabase in claude.ai Settings → Connectors, then try again.";
     case "server_not_connected": return "The Supabase connector isn't added for your account. Add it in claude.ai Settings → Connectors to load live data.";
     case "selection_required": return "You have more than one Supabase connector — choose which one this page should use when prompted, then try again.";
@@ -672,7 +657,7 @@ function errText(e){
     case "server_unavailable": return "Supabase didn't respond. Try again in a moment.";
     case "cancelled": return "Supabase took longer than 90 seconds to answer. Check for an approval prompt from Claude, then reload the page.";
     case "tool_error": return "Supabase returned an error: "+(e.message||"query failed");
-    case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view.";
+    case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view — showing the saved snapshot.";
     default: return (e&&e.message)||"Couldn't load live data.";
   }
 }
@@ -688,41 +673,33 @@ const qCamp=w=>`with c as (select week_start, campaign_id, coalesce(pageviews,0)
 function setSrc(s,t){ S.live=s; const e=document.getElementById("src"); e.dataset.s=s; document.getElementById("srcT").textContent=t; }
 async function goLive(){
   const btn=document.getElementById("refresh"); if(btn.disabled) return; btn.disabled=true;
-  const first=!S.rows.length;
-  const stop=(state,msg)=>{ btn.disabled=false;
-    if(state==="signin"||state==="denied"||first) gate(state,msg); else setSrc("error","Live load failed · "+msg); };
   if(IN_CLAUDE){
     if(!S.mcp){ const mcp=await window.claude.use("mcp").catch(()=>null);
-      if(!mcp) return stop("error","Live data isn't available in this view.");
+      if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
       S.mcp=mcp; }
-  } else if(!(await Auth.token())){ Auth.signOut(); return stop("signin"); }
+  } else {
+    const sb=await getSB();
+    if(!sb){ setSrc("error","Snapshot · couldn't reach Supabase"); btn.disabled=false; return; }
+  }
   S.liveOn=true;
-  const msg = IN_CLAUDE ? "Loading from Supabase… approve the prompt if one appears" : "Loading from Supabase…";
-  if(first) gate("loading",msg);
-  setSrc("loading",msg); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; if(!first) renderCampaigns();
+  setSrc("loading", IN_CLAUDE ? "Loading from Supabase… approve the prompt if one appears" : "Loading from Supabase…"); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; renderCampaigns();
   const [sum,st]=await Promise.allSettled([fetchSummary(),fetchStats()]);
-  if(!IN_CLAUDE && !Auth.email()){ btn.disabled=false; return; }   // signed out while loading
   if(sum.status==="fulfilled" && sum.value.length){
     const keepW=S.rows[S.sel]&&S.rows[S.sel].w, wasLatest=S.sel===S.rows.length-1;
     setRows(sum.value.map(r=>{const o={w:r.w}; RAW.forEach(k=>o[k]=Number(r[k])||0); return o;}));
     const i=S.rows.findIndex(r=>r.w===keepW); S.sel = wasLatest||i<0 ? S.rows.length-1 : i;
     const t=new Date(); setSrc("live",`Live · Supabase · ${t.getHours().toString().padStart(2,"0")}:${t.getMinutes().toString().padStart(2,"0")}`);
-  } else {
-    const e=sum.status==="rejected" ? sum.reason : null, code=e&&e.code;
-    if(code==="login_required"){ Auth.signOut(); return stop("signin",errText(e)); }
-    if(code==="not_allowed") return stop("denied",errText(e));
-    if(first) return stop("error", e ? errText(e) : "Supabase returned no rows.");
-    setSrc("error","Live load failed · showing earlier numbers"); if(e) S.statsErr=errText(e);
-  }
+    
+  } else { setSrc("error","Snapshot · "+(sum.status==="rejected"?"live load failed":"no rows returned")); if(sum.status==="rejected") S.statsErr=errText(sum.reason); }
   if(st.status==="fulfilled"){ S.stats={}; st.value.forEach(r=>{ S.stats[r.w]={n_live:+r.n_live,n_don:+r.n_don,n_new:+r.n_new,top10:+r.top10,tot:+r.tot}; }); }
   else S.statsErr = errText(st.reason);
-  btn.disabled=false; gate(null); fillWeeks(); renderAll(); loadCohorts();
+  btn.disabled=false; fillWeeks(); renderAll(); loadCohorts();
 }
 async function loadCamp(w){
   if(S.campLoading[w]) return; S.campLoading[w]=true;
   try{ const rows=await fetchCampWeek(w); S.camp[w]=rows.map(r=>({id:String(r.id),pv:+r.pv,uv:+r.uv,ci:+r.ci,op:+r.op,d:+r.d,pd:+r.pd,tot:r.tot==null?null:+r.tot,fw:r.fw||null,nm:r.nm||""})); }
   catch(e){ S.campErr[w]=errText(e); }
-  S.campLoading[w]=false; if(S.rows[S.sel]&&S.rows[S.sel].w===w) renderCampaigns();
+  S.campLoading[w]=false; if(S.rows[S.sel].w===w) renderCampaigns();
 }
 
 /* ---------- launch-month cohorts ---------- */
@@ -838,81 +815,29 @@ async function loadCohorts(){
   try{ const {rows,camps,seen}=await fetchCohorts();
     S.coh={rows:rows.map(r=>({w:r.w,id:String(r.id),d:+r.d,op:+r.op})), camps:camps.map(c=>({id:String(c.id),fw:c.fw,nm:c.nm||""})), seen:seen.map(s=>({fw:s.fw,n:+s.n})).sort((a,b)=>a.fw<b.fw?-1:1)}; }
   catch(e){ S.cohErr=errText(e); }
-  if(S.rows.length) renderCohorts();
+  renderCohorts();
 }
 
 
 /* ---------- data layer: Claude connector (artifact) or Supabase (hosted page) ---------- */
 const IN_CLAUDE = !!window.claude;
 const SB_URL = "https://njgctrmitailbvjtyeiz.supabase.co";
-const DASH_API = SB_URL + "/functions/v1/otd-dash"; // checks the MetaGo sign-in, then reads the otd_dash_* functions
-
-/* ---------- sign-in: MetaGo Central Auth (OAuth 2.1 authorization code + PKCE) ---------- */
-const AUTH = {
-  issuer: "https://auth.metago.health",
-  clientId: "",   // TODO: this dashboard's client id, registered at auth.metago.health
-  scope: ""       // TODO: only if the auth service asks for one
-};
-const Auth = (()=>{
-  const K="otd_auth", redirect=location.origin+location.pathname;
-  const get=k=>{ try{ return JSON.parse(sessionStorage.getItem(k)||"null"); }catch(e){ return null; } };
-  const put=(k,v)=>{ try{ v==null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k,JSON.stringify(v)); }catch(e){} };
-  let t=get(K), refreshing=null;
-  const b64u=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-  const rand=n=>b64u(crypto.getRandomValues(new Uint8Array(n)));
-  const claims=jwt=>{ try{ return JSON.parse(atob(jwt.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))); }catch(e){ return {}; } };
-  async function exchange(params){
-    const r=await fetch(AUTH.issuer+"/oauth/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams(Object.assign({client_id:AUTH.clientId},params))}).catch(()=>null);
-    const d=r ? await r.json().catch(()=>({})) : {};
-    if(!r||!r.ok||!d.access_token) throw {code:"login_failed",message:d.error_description||d.error||(r?"the sign-in service answered "+r.status:"couldn't reach auth.metago.health")};
-    const c=claims(d.access_token), exp=c.exp ? c.exp*1000 : Date.now()+(d.expires_in||300)*1000;
-    // refresh a minute early, or a quarter of the lifetime early for short-lived tokens
-    t={at:d.access_token, rt:d.refresh_token||(t&&t.rt)||null, renew:exp-Math.min(60e3,(exp-Date.now())/4), email:c.email||""};
-    put(K,t);
-  }
-  return {
-    configured: () => !!AUTH.clientId,
-    email: () => t&&t.email,
-    async signIn(){
-      const v=rand(48), state=rand(16);
-      const challenge=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
-      put(K+"_pkce",{v,state});
-      const q=new URLSearchParams({response_type:"code",client_id:AUTH.clientId,redirect_uri:redirect,code_challenge:challenge,code_challenge_method:"S256",state});
-      if(AUTH.scope) q.set("scope",AUTH.scope);
-      location.assign(AUTH.issuer+"/oauth/authorize?"+q);
-    },
-    // Finish the trip back from auth.metago.health (?code=…&state=…).
-    async handleRedirect(){
-      const p=new URLSearchParams(location.search); if(!p.has("code")&&!p.has("error")) return;
-      history.replaceState(null,"",redirect+location.hash);
-      const pk=get(K+"_pkce"); put(K+"_pkce",null);
-      if(p.has("error")) throw {code:"login_failed",message:p.get("error_description")||p.get("error")};
-      if(!pk||pk.state!==p.get("state")) throw {code:"login_failed",message:"the response didn't match this tab. Please try again."};
-      await exchange({grant_type:"authorization_code",code:p.get("code"),redirect_uri:redirect,code_verifier:pk.v});
-    },
-    // One refresh at a time: refresh tokens rotate, and reusing an old one revokes the session.
-    refresh(){
-      if(!t||!t.rt) return Promise.resolve(false);
-      return refreshing || (refreshing=exchange({grant_type:"refresh_token",refresh_token:t.rt}).then(()=>true,()=>false).finally(()=>{ refreshing=null; }));
-    },
-    async token(){
-      if(!t) return null;
-      if(Date.now()>t.renew && !(await this.refresh())) return null;
-      return t.at;
-    },
-    signOut(){ t=null; put(K,null); }
-  };
-})();
-
-async function rpc(fn,args,retried){
-  const tok=await Auth.token(); if(!tok) throw {code:"login_required"};
-  const r=await fetch(DASH_API,{method:"POST",headers:{"Authorization":"Bearer "+tok,"Content-Type":"application/json"},body:JSON.stringify({fn,args:args||{}})}).catch(()=>null);
-  if(!r) throw {code:"server_unavailable"};
-  if(r.status===401 && !retried && await Auth.refresh()) return rpc(fn,args,true);
-  const d=await r.json().catch(()=>null);
-  if(!r.ok) throw {code:(d&&d.code)||(r.status===401?"login_required":"http_"+r.status),message:(d&&d.message)||("The data service answered "+r.status+".")};
-  return d;
+const SB_KEY = "sb_publishable_rAYKIz4k6hXqg5H-QPiDSg_cUfMPZYH"; // publishable key: safe in a web page; data access is enforced in the database
+const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js";
+let _sb=null, _sbLoading=null;
+function getSB(){
+  if(_sb) return Promise.resolve(_sb);
+  if(_sbLoading) return _sbLoading;
+  _sbLoading=new Promise(res=>{
+    const done=()=>{ try{ _sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}); res(_sb);}catch(e){ res(null);} };
+    if(window.supabase&&window.supabase.createClient) return done();
+    const s=document.createElement("script"); s.src=SB_LIB; s.onload=done; s.onerror=()=>res(null); document.head.appendChild(s);
+  });
+  return _sbLoading;
+}
+async function rpc(name,args){
+  const sb=await getSB(); const {data,error}=await sb.rpc(name,args||{});
+  if(error) throw {code:error.code,message:error.message}; return data;
 }
 const fetchSummary = () => IN_CLAUDE ? sql(Q_SUM) : rpc("otd_dash_weekly_summary");
 const fetchStats   = () => IN_CLAUDE ? sql(Q_STATS) : rpc("otd_dash_campaign_stats");
@@ -930,7 +855,7 @@ function fillWeeks(){
   s.innerHTML=S.rows.map((r,i)=>`<option value="${i}">${wlY(r.w)}${i===S.rows.length-1?" (latest)":""}</option>`).reverse().join("");
   s.value=S.sel;
 }
-function renderAll(){ if(!S.rows.length) return; renderBrief(); renderKPIs(); renderCharts(); renderFunnel(); renderTable(); renderCampaigns(); renderCohorts(); }
+function renderAll(){ renderBrief(); renderKPIs(); renderCharts(); renderFunnel(); renderTable(); renderCampaigns(); renderCohorts(); }
 document.getElementById("wk").addEventListener("change",e=>{ S.sel=+e.target.value; renderAll(); });
 [["cmp","cmp",v=>v],["rng","rng",v=>+v]].forEach(([id,key,cv])=>{
   document.getElementById(id).addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
@@ -948,42 +873,10 @@ const mq=matchMedia("(prefers-color-scheme: dark)"); const rerender=()=>renderAl
 mq.addEventListener&&mq.addEventListener("change",rerender);
 new MutationObserver(rerender).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
-/* ---------- sign-in gate ---------- */
-const GATE = {
-  signin:  ["Sign in to view the dashboard", "The weekly review is for MetaGo staff. Sign in with your MetaGo account to load the latest numbers."],
-  loading: ["Loading the dashboard…", ""],
-  error:   ["Couldn't load the dashboard", ""],
-  denied:  ["No access", ""],
-  setup:   ["Sign-in isn't set up yet", "This page needs its MetaGo client id (AUTH.clientId in index.html) before anyone can sign in."]
-};
-function gate(state,msg){
-  document.body.toggleAttribute("data-gate",!!state);
-  document.getElementById("gate").hidden=!state;
-  const email=!IN_CLAUDE && Auth.email();
-  document.getElementById("user").hidden=!email; document.getElementById("userEmail").textContent=email||"";
-  if(!state) return;
-  document.getElementById("gateT").textContent=GATE[state][0];
-  document.getElementById("gateMsg").textContent=msg||GATE[state][1];
-  document.getElementById("signin").hidden=state!=="signin";
-  document.getElementById("gateRetry").hidden=state!=="error";
-}
-document.getElementById("signin").addEventListener("click",e=>{ e.target.disabled=true; Auth.signIn(); });
-document.getElementById("gateRetry").addEventListener("click",()=>goLive());
-document.getElementById("signout").addEventListener("click",()=>{
-  Auth.signOut(); S.rows=[]; S.liveOn=false; S.stats=null; S.camp={}; S.coh=null;
-  gate("signin","You've signed out of this dashboard. Your MetaGo sign-in on other apps is unchanged.");
-});
+fillWeeks(); setSrc("snap",`Snapshot · through ${wlY(S.rows[S.rows.length-1].w)}`); renderAll(); redrawOnResize();
 
-async function boot(){
-  redrawOnResize();
-  if(IN_CLAUDE) return goLive();   // inside Claude, the viewer's own Supabase connector controls access
-  if(!Auth.configured()) return gate("setup");
-  gate("loading","Checking your sign-in…");
-  try{ await Auth.handleRedirect(); }catch(e){ return gate("signin",errText(e)); }
-  if(!(await Auth.token())) return gate("signin");
-  goLive();
-}
-boot();
+/* load live data from Supabase as soon as the page opens */
+goLive();
 </script>
 
 </body>

@@ -183,12 +183,6 @@ td.nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--m
 .foot{margin-top:32px;font-size:12px;color:var(--muted);display:grid;gap:4px}
 .foot b{color:var(--ink-2);font-weight:600}
 @media (prefers-reduced-motion:no-preference){.fb,.mv .b{transition:width .35s ease}}
-/* sign-in gate: until data loads, only the header and the gate show */
-body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(#user){display:none}
-.gate{margin-top:28px}
-.gate h2{margin:0 0 4px}
-.src[hidden]{display:none}
-.linkbtn{border:0;background:none;color:var(--accent-ink);cursor:pointer;font-size:12px;font-weight:600;padding:0 0 0 6px}
 </style>
 
 <div class="wrap">
@@ -213,19 +207,11 @@ body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(
             <button type="button" data-v="0" aria-pressed="false">All</button>
           </div>
         </div>
-        <span class="src" id="src" data-s="loading"><span class="dot"></span><span id="srcT">Loading…</span></span>
+        <span class="src" id="src" data-s="snap"><span class="dot"></span><span id="srcT">Snapshot</span></span>
         <button type="button" class="btn" id="refresh" title="Fetch the latest numbers from Supabase">↻ Refresh</button>
-        <span class="src" id="user" hidden><span id="userEmail"></span><button type="button" class="linkbtn" id="signout">Sign out</button></span>
       </div>
     </div>
   </header>
-
-  <div class="gate" id="gate" hidden>
-    <div class="notice">
-      <div><h2 id="gateT"></h2><p id="gateMsg"></p></div>
-      <div><button type="button" class="btn primary" id="signin">Sign in with MetaGo</button> <button type="button" class="btn" id="gateRetry">Try again</button></div>
-    </div>
-  </div>
 
   <div class="summary"><div class="brief" id="brief"></div></div>
 
@@ -305,6 +291,7 @@ body[data-gate] .wrap > :not(.bar):not(#gate), body[data-gate] .controls > :not(
 <div id="tip" hidden></div>
 
 <script>
+const SNAP = __SNAP__;
 const PROJECT = "njgctrmitailbvjtyeiz";
 const SERVER = "Supabase", TOOL = "execute_sql";
 const ANN = [{w:"2026-02-23", t:"cart tracking change?"}];
@@ -349,8 +336,10 @@ const M = {
 };
 
 /* ---------- state ---------- */
-const S = { rows:[], sel:0, cmp:"wow", rng:26, live:"loading", mcp:null, stats:null, statsErr:null, camp:{}, campErr:{}, campLoading:{} };
+const S = { rows:[], sel:0, cmp:"wow", rng:26, live:"snap", mcp:null, stats:null, statsErr:null, camp:{}, campErr:{}, campLoading:{} };
 function setRows(list){ S.rows = list.map(r=>derive(Object.assign({},r))).sort((a,b)=>a.w<b.w?-1:1); }
+setRows(SNAP);
+S.sel = S.rows.length-1;
 
 function baseline(i){
   if(S.cmp==="wow"){ return i>0 ? S.rows[i-1] : null; }
@@ -653,10 +642,6 @@ function rowsFrom(res){
 function errText(e){
   if(e && e.code==="42501") return "Supabase refused access to the dashboard data.";
   switch(e&&e.code){
-    case "login_required": return "Your sign-in has expired. Sign in again to load the dashboard.";
-    case "login_failed": return "Sign-in didn't complete: "+(e.message||"please try again.");
-    case "not_allowed": return (e.message||"This account doesn't have access to this dashboard.")+" Ask the dashboard owner for access.";
-    case "misconfigured": return "The dashboard's data service isn't set up yet ("+(e.message||"missing settings")+").";
     case "needs_reauth": return "Your Supabase connection has expired. Reconnect Supabase in claude.ai Settings → Connectors, then try again.";
     case "server_not_connected": return "The Supabase connector isn't added for your account. Add it in claude.ai Settings → Connectors to load live data.";
     case "selection_required": return "You have more than one Supabase connector — choose which one this page should use when prompted, then try again.";
@@ -665,7 +650,7 @@ function errText(e){
     case "server_unavailable": return "Supabase didn't respond. Try again in a moment.";
     case "cancelled": return "Supabase took longer than 90 seconds to answer. Check for an approval prompt from Claude, then reload the page.";
     case "tool_error": return "Supabase returned an error: "+(e.message||"query failed");
-    case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view.";
+    case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view — showing the saved snapshot.";
     default: return (e&&e.message)||"Couldn't load live data.";
   }
 }
@@ -681,41 +666,33 @@ const qCamp=w=>`with c as (select week_start, campaign_id, coalesce(pageviews,0)
 function setSrc(s,t){ S.live=s; const e=document.getElementById("src"); e.dataset.s=s; document.getElementById("srcT").textContent=t; }
 async function goLive(){
   const btn=document.getElementById("refresh"); if(btn.disabled) return; btn.disabled=true;
-  const first=!S.rows.length;
-  const stop=(state,msg)=>{ btn.disabled=false;
-    if(state==="signin"||state==="denied"||first) gate(state,msg); else setSrc("error","Live load failed · "+msg); };
   if(IN_CLAUDE){
     if(!S.mcp){ const mcp=await window.claude.use("mcp").catch(()=>null);
-      if(!mcp) return stop("error","Live data isn't available in this view.");
+      if(!mcp){ setSrc("error","Snapshot · live data unavailable here"); btn.disabled=false; campMsg(`<div class="notice"><p>Live data isn't available in this view, so the campaign drill-down can't load. The rest of the page uses the saved snapshot.</p></div>`); return; }
       S.mcp=mcp; }
-  } else if(!(await Auth.token())){ Auth.signOut(); return stop("signin"); }
+  } else {
+    const sb=await getSB();
+    if(!sb){ setSrc("error","Snapshot · couldn't reach Supabase"); btn.disabled=false; return; }
+  }
   S.liveOn=true;
-  const msg = IN_CLAUDE ? "Loading from Supabase… approve the prompt if one appears" : "Loading from Supabase…";
-  if(first) gate("loading",msg);
-  setSrc("loading",msg); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; if(!first) renderCampaigns();
+  setSrc("loading", IN_CLAUDE ? "Loading from Supabase… approve the prompt if one appears" : "Loading from Supabase…"); S.statsErr=null; S.stats=null; S.camp={}; S.campErr={}; renderCampaigns();
   const [sum,st]=await Promise.allSettled([fetchSummary(),fetchStats()]);
-  if(!IN_CLAUDE && !Auth.email()){ btn.disabled=false; return; }   // signed out while loading
   if(sum.status==="fulfilled" && sum.value.length){
     const keepW=S.rows[S.sel]&&S.rows[S.sel].w, wasLatest=S.sel===S.rows.length-1;
     setRows(sum.value.map(r=>{const o={w:r.w}; RAW.forEach(k=>o[k]=Number(r[k])||0); return o;}));
     const i=S.rows.findIndex(r=>r.w===keepW); S.sel = wasLatest||i<0 ? S.rows.length-1 : i;
     const t=new Date(); setSrc("live",`Live · Supabase · ${t.getHours().toString().padStart(2,"0")}:${t.getMinutes().toString().padStart(2,"0")}`);
-  } else {
-    const e=sum.status==="rejected" ? sum.reason : null, code=e&&e.code;
-    if(code==="login_required"){ Auth.signOut(); return stop("signin",errText(e)); }
-    if(code==="not_allowed") return stop("denied",errText(e));
-    if(first) return stop("error", e ? errText(e) : "Supabase returned no rows.");
-    setSrc("error","Live load failed · showing earlier numbers"); if(e) S.statsErr=errText(e);
-  }
+    
+  } else { setSrc("error","Snapshot · "+(sum.status==="rejected"?"live load failed":"no rows returned")); if(sum.status==="rejected") S.statsErr=errText(sum.reason); }
   if(st.status==="fulfilled"){ S.stats={}; st.value.forEach(r=>{ S.stats[r.w]={n_live:+r.n_live,n_don:+r.n_don,n_new:+r.n_new,top10:+r.top10,tot:+r.tot}; }); }
   else S.statsErr = errText(st.reason);
-  btn.disabled=false; gate(null); fillWeeks(); renderAll(); loadCohorts();
+  btn.disabled=false; fillWeeks(); renderAll(); loadCohorts();
 }
 async function loadCamp(w){
   if(S.campLoading[w]) return; S.campLoading[w]=true;
   try{ const rows=await fetchCampWeek(w); S.camp[w]=rows.map(r=>({id:String(r.id),pv:+r.pv,uv:+r.uv,ci:+r.ci,op:+r.op,d:+r.d,pd:+r.pd,tot:r.tot==null?null:+r.tot,fw:r.fw||null,nm:r.nm||""})); }
   catch(e){ S.campErr[w]=errText(e); }
-  S.campLoading[w]=false; if(S.rows[S.sel]&&S.rows[S.sel].w===w) renderCampaigns();
+  S.campLoading[w]=false; if(S.rows[S.sel].w===w) renderCampaigns();
 }
 
 /* ---------- launch-month cohorts ---------- */
@@ -831,81 +808,29 @@ async function loadCohorts(){
   try{ const {rows,camps,seen}=await fetchCohorts();
     S.coh={rows:rows.map(r=>({w:r.w,id:String(r.id),d:+r.d,op:+r.op})), camps:camps.map(c=>({id:String(c.id),fw:c.fw,nm:c.nm||""})), seen:seen.map(s=>({fw:s.fw,n:+s.n})).sort((a,b)=>a.fw<b.fw?-1:1)}; }
   catch(e){ S.cohErr=errText(e); }
-  if(S.rows.length) renderCohorts();
+  renderCohorts();
 }
 
 
 /* ---------- data layer: Claude connector (artifact) or Supabase (hosted page) ---------- */
 const IN_CLAUDE = !!window.claude;
 const SB_URL = "https://njgctrmitailbvjtyeiz.supabase.co";
-const DASH_API = SB_URL + "/functions/v1/otd-dash"; // checks the MetaGo sign-in, then reads the otd_dash_* functions
-
-/* ---------- sign-in: MetaGo Central Auth (OAuth 2.1 authorization code + PKCE) ---------- */
-const AUTH = {
-  issuer: "https://auth.metago.health",
-  clientId: "",   // TODO: this dashboard's client id, registered at auth.metago.health
-  scope: ""       // TODO: only if the auth service asks for one
-};
-const Auth = (()=>{
-  const K="otd_auth", redirect=location.origin+location.pathname;
-  const get=k=>{ try{ return JSON.parse(sessionStorage.getItem(k)||"null"); }catch(e){ return null; } };
-  const put=(k,v)=>{ try{ v==null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k,JSON.stringify(v)); }catch(e){} };
-  let t=get(K), refreshing=null;
-  const b64u=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-  const rand=n=>b64u(crypto.getRandomValues(new Uint8Array(n)));
-  const claims=jwt=>{ try{ return JSON.parse(atob(jwt.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))); }catch(e){ return {}; } };
-  async function exchange(params){
-    const r=await fetch(AUTH.issuer+"/oauth/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:new URLSearchParams(Object.assign({client_id:AUTH.clientId},params))}).catch(()=>null);
-    const d=r ? await r.json().catch(()=>({})) : {};
-    if(!r||!r.ok||!d.access_token) throw {code:"login_failed",message:d.error_description||d.error||(r?"the sign-in service answered "+r.status:"couldn't reach auth.metago.health")};
-    const c=claims(d.access_token), exp=c.exp ? c.exp*1000 : Date.now()+(d.expires_in||300)*1000;
-    // refresh a minute early, or a quarter of the lifetime early for short-lived tokens
-    t={at:d.access_token, rt:d.refresh_token||(t&&t.rt)||null, renew:exp-Math.min(60e3,(exp-Date.now())/4), email:c.email||""};
-    put(K,t);
-  }
-  return {
-    configured: () => !!AUTH.clientId,
-    email: () => t&&t.email,
-    async signIn(){
-      const v=rand(48), state=rand(16);
-      const challenge=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
-      put(K+"_pkce",{v,state});
-      const q=new URLSearchParams({response_type:"code",client_id:AUTH.clientId,redirect_uri:redirect,code_challenge:challenge,code_challenge_method:"S256",state});
-      if(AUTH.scope) q.set("scope",AUTH.scope);
-      location.assign(AUTH.issuer+"/oauth/authorize?"+q);
-    },
-    // Finish the trip back from auth.metago.health (?code=…&state=…).
-    async handleRedirect(){
-      const p=new URLSearchParams(location.search); if(!p.has("code")&&!p.has("error")) return;
-      history.replaceState(null,"",redirect+location.hash);
-      const pk=get(K+"_pkce"); put(K+"_pkce",null);
-      if(p.has("error")) throw {code:"login_failed",message:p.get("error_description")||p.get("error")};
-      if(!pk||pk.state!==p.get("state")) throw {code:"login_failed",message:"the response didn't match this tab. Please try again."};
-      await exchange({grant_type:"authorization_code",code:p.get("code"),redirect_uri:redirect,code_verifier:pk.v});
-    },
-    // One refresh at a time: refresh tokens rotate, and reusing an old one revokes the session.
-    refresh(){
-      if(!t||!t.rt) return Promise.resolve(false);
-      return refreshing || (refreshing=exchange({grant_type:"refresh_token",refresh_token:t.rt}).then(()=>true,()=>false).finally(()=>{ refreshing=null; }));
-    },
-    async token(){
-      if(!t) return null;
-      if(Date.now()>t.renew && !(await this.refresh())) return null;
-      return t.at;
-    },
-    signOut(){ t=null; put(K,null); }
-  };
-})();
-
-async function rpc(fn,args,retried){
-  const tok=await Auth.token(); if(!tok) throw {code:"login_required"};
-  const r=await fetch(DASH_API,{method:"POST",headers:{"Authorization":"Bearer "+tok,"Content-Type":"application/json"},body:JSON.stringify({fn,args:args||{}})}).catch(()=>null);
-  if(!r) throw {code:"server_unavailable"};
-  if(r.status===401 && !retried && await Auth.refresh()) return rpc(fn,args,true);
-  const d=await r.json().catch(()=>null);
-  if(!r.ok) throw {code:(d&&d.code)||(r.status===401?"login_required":"http_"+r.status),message:(d&&d.message)||("The data service answered "+r.status+".")};
-  return d;
+const SB_KEY = "sb_publishable_rAYKIz4k6hXqg5H-QPiDSg_cUfMPZYH"; // publishable key: safe in a web page; data access is enforced in the database
+const SB_LIB = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js";
+let _sb=null, _sbLoading=null;
+function getSB(){
+  if(_sb) return Promise.resolve(_sb);
+  if(_sbLoading) return _sbLoading;
+  _sbLoading=new Promise(res=>{
+    const done=()=>{ try{ _sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}}); res(_sb);}catch(e){ res(null);} };
+    if(window.supabase&&window.supabase.createClient) return done();
+    const s=document.createElement("script"); s.src=SB_LIB; s.onload=done; s.onerror=()=>res(null); document.head.appendChild(s);
+  });
+  return _sbLoading;
+}
+async function rpc(name,args){
+  const sb=await getSB(); const {data,error}=await sb.rpc(name,args||{});
+  if(error) throw {code:error.code,message:error.message}; return data;
 }
 const fetchSummary = () => IN_CLAUDE ? sql(Q_SUM) : rpc("otd_dash_weekly_summary");
 const fetchStats   = () => IN_CLAUDE ? sql(Q_STATS) : rpc("otd_dash_campaign_stats");
@@ -923,7 +848,7 @@ function fillWeeks(){
   s.innerHTML=S.rows.map((r,i)=>`<option value="${i}">${wlY(r.w)}${i===S.rows.length-1?" (latest)":""}</option>`).reverse().join("");
   s.value=S.sel;
 }
-function renderAll(){ if(!S.rows.length) return; renderBrief(); renderKPIs(); renderCharts(); renderFunnel(); renderTable(); renderCampaigns(); renderCohorts(); }
+function renderAll(){ renderBrief(); renderKPIs(); renderCharts(); renderFunnel(); renderTable(); renderCampaigns(); renderCohorts(); }
 document.getElementById("wk").addEventListener("change",e=>{ S.sel=+e.target.value; renderAll(); });
 [["cmp","cmp",v=>v],["rng","rng",v=>+v]].forEach(([id,key,cv])=>{
   document.getElementById(id).addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
@@ -941,40 +866,8 @@ const mq=matchMedia("(prefers-color-scheme: dark)"); const rerender=()=>renderAl
 mq.addEventListener&&mq.addEventListener("change",rerender);
 new MutationObserver(rerender).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
-/* ---------- sign-in gate ---------- */
-const GATE = {
-  signin:  ["Sign in to view the dashboard", "The weekly review is for MetaGo staff. Sign in with your MetaGo account to load the latest numbers."],
-  loading: ["Loading the dashboard…", ""],
-  error:   ["Couldn't load the dashboard", ""],
-  denied:  ["No access", ""],
-  setup:   ["Sign-in isn't set up yet", "This page needs its MetaGo client id (AUTH.clientId in index.html) before anyone can sign in."]
-};
-function gate(state,msg){
-  document.body.toggleAttribute("data-gate",!!state);
-  document.getElementById("gate").hidden=!state;
-  const email=!IN_CLAUDE && Auth.email();
-  document.getElementById("user").hidden=!email; document.getElementById("userEmail").textContent=email||"";
-  if(!state) return;
-  document.getElementById("gateT").textContent=GATE[state][0];
-  document.getElementById("gateMsg").textContent=msg||GATE[state][1];
-  document.getElementById("signin").hidden=state!=="signin";
-  document.getElementById("gateRetry").hidden=state!=="error";
-}
-document.getElementById("signin").addEventListener("click",e=>{ e.target.disabled=true; Auth.signIn(); });
-document.getElementById("gateRetry").addEventListener("click",()=>goLive());
-document.getElementById("signout").addEventListener("click",()=>{
-  Auth.signOut(); S.rows=[]; S.liveOn=false; S.stats=null; S.camp={}; S.coh=null;
-  gate("signin","You've signed out of this dashboard. Your MetaGo sign-in on other apps is unchanged.");
-});
+fillWeeks(); setSrc("snap",`Snapshot · through ${wlY(S.rows[S.rows.length-1].w)}`); renderAll(); redrawOnResize();
 
-async function boot(){
-  redrawOnResize();
-  if(IN_CLAUDE) return goLive();   // inside Claude, the viewer's own Supabase connector controls access
-  if(!Auth.configured()) return gate("setup");
-  gate("loading","Checking your sign-in…");
-  try{ await Auth.handleRedirect(); }catch(e){ return gate("signin",errText(e)); }
-  if(!(await Auth.token())) return gate("signin");
-  goLive();
-}
-boot();
+/* load live data from Supabase as soon as the page opens */
+goLive();
 </script>
